@@ -22,6 +22,7 @@ void Form::render()
     Point org = anim.getPos();
     glTranslated(org.x, org.y, org.z);
     glColor3f(col.r, col.g, col.b);
+    glRotated(anim.getPhi(),0.0, 1.0, 0.0);
 }
 
 
@@ -64,6 +65,7 @@ Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color 
 void Cube_face::update(double delta_t)
 {
     // Complete this part
+    anim.setPhi(anim.getPhi() + 1);
 }
 
 
