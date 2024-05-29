@@ -3,7 +3,7 @@
 
 #include "geometry.h"
 #include "animation.h"
-
+#include <vector>
 
 class Color
 {
@@ -66,6 +66,17 @@ public:
     Cube_face(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1),
           Point org = Point(), double l = 1.0, double w = 1.0,
           Color cl = Color());
+    void update(double delta_t);
+    void render();
+};
+
+class Plateau : public Form
+{
+private:
+    std::vector<Cube_face> faces;
+
+public:
+    Plateau(double size = 1.0, Color cl = Color());
     void update(double delta_t);
     void render();
 };
