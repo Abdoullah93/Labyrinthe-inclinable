@@ -48,7 +48,7 @@ private:
     // => no center required here, information is stored in the anim object
     double radius;
 public:
-    Sphere(double r = 1.0, Color cl = Color());
+    Sphere(double r = 1.0, Color cl = Color(), Point org = Point());
     double getRadius() const {return radius;}
     void setRadius(double r) {radius = r;}
     void update(double delta_t);
@@ -69,6 +69,7 @@ public:
     void update(double delta_t);
     void render();
 };
+
 
 class Plateau : public Form
 {
