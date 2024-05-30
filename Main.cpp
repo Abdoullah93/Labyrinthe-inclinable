@@ -212,6 +212,9 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
 	// Render the coordinates system
 	glBegin(GL_LINES);
 	{
+		// X rouge
+		// Y vert
+		// Z bleue
 		glColor3f(1.0f, 0.0f, 0.0f);
 		glVertex3i(0, 0, 0);
 		glVertex3i(1, 0, 0);
@@ -287,8 +290,14 @@ int main(int argc, char* args[])
 		// Don't forget to update the actual number_of_forms ! 
 		/*
 		Cube_face *pFace = NULL;
-		pFace = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
-		forms_list[number_of_forms] = pFace;
+        // Create the remaining faces of the cube
+        pFace = new Cube_face(Vector(0, 1, 0), Vector(0, 0, 1), Point(-0.5, -0.5, -0.5), 1, 1, YELLOW);
+        forms_list[number_of_forms] = pFace;
+        number_of_forms++;
+
+		Sphere *pSphere = NULL;
+		pSphere = new Sphere(0.5, RED, Point(1, 1, 1));
+		forms_list[number_of_forms] = pSphere;
 		number_of_forms++;
 		*/
 		// Creer le plateau centré à l'origine (pour l'instant c'est une planche)

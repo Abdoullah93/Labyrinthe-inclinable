@@ -28,20 +28,22 @@ void Form::render()
     glRotated(anim.getPhi(), 0, 0, 1);
     glTranslated(org.x, org.y, org.z);
     glColor3f(col.r, col.g, col.b);
+    glRotated(anim.getPhi(),0.0, 1.0, 0.0);
 }
 
 
-Sphere::Sphere(double r, Color cl)
+Sphere::Sphere(double r, Color cl, Point org)
 {
     radius = r;
     col = cl;
+    //anim.setPos(org);
 }
 
 
 void Sphere::update(double delta_t)
 {
     anim.setSpeed(anim.getSpeed() + anim.getAccel());
-    // Mise à jour de la position en fonction de la vitesse
+    // Mise ï¿½ jour de la position en fonction de la vitesse
     Point org = anim.getPos();
     org.translate(anim.getSpeed());
     anim.setPos(org);
@@ -55,6 +57,7 @@ void Sphere::render()
     quad = gluNewQuadric();
     Form::render();
     gluSphere(quad, radius, 32, 32);  // On se prend pas la tete, c'est pour dessiner la sphere
+
     gluDeleteQuadric(quad);
 }
 
@@ -73,7 +76,6 @@ Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color 
 
 void Cube_face::update(double delta_t)
 {   
-
 
 }
 
