@@ -192,7 +192,7 @@ void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
     }
 }
 
-void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos)
+void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos, double camAlpha)
 {
     // Clear color buffer and Z-Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -206,6 +206,9 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos)
     // Isometric view
     glRotated(-45, 0, 1, 0);
     glRotated(30, 1, 0, -1);
+
+    //Rotation of the camer (dillusion)
+    glRotated(camAlpha, 0, 1, 0);
 
     // X, Y and Z axis
     glPushMatrix(); // Preserve the camera viewing point for further forms
@@ -261,6 +264,8 @@ int main(int argc, char* args[])
     // OpenGL context
     SDL_GLContext gContext;
 
+    // Camera parameters
+    double camAlpha = 0.0;
 
     // Start up SDL and create window
     if (!init(&gWindow, &gContext))
@@ -307,22 +312,6 @@ int main(int argc, char* args[])
         forms_list[number_of_forms] = Plateau;
         number_of_forms++;
 
-        // Creer la balle et la placer sur le plateau (une vitesse et une acceleration sont données pour tester)
-        Sphere* Balle = NULL;
-        Balle = new Sphere(B_radius, B_color);
-        Balle->getAnim().setPos(Point(0, B_radius, 0));
-
-        Vector* B_Speed = NULL;
-        B_Speed = new Vector(-0.005, 0, 0.005);
-        Balle->getAnim().setSpeed(*B_Speed);
-
-
-        Vector* B_Accel = new Vector(0.0001, 0, 0);
-        Balle->getAnim().setAccel(*B_Accel);
-
-        forms_list[number_of_forms] = Balle;
-        number_of_forms++;
-
         //Creer les murs du plateau
         Cube_face* Mur1 = NULL;
         Mur1 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-P_width / 2, 0, -P_length / 2), P_width, 0.1, WHITE);
@@ -345,6 +334,27 @@ int main(int argc, char* args[])
         number_of_forms++;
 
         Form* murs_list[4] = { Mur1, Mur2, Mur3, Mur4 };
+
+        // 
+        Hole* Trou1 = NULL;
+        Trou1 = new Hole(Point(P_width / 2, 0, P_length / 2), 0.1);
+        Plateau->setHole(Trou1);
+
+
+        // Creer la balle et la placer sur le plateau (une vitesse et une acceleration sont données pour tester)
+        Sphere* Balle = NULL;
+        Balle = new Sphere(B_radius, B_color);
+        Balle->getAnim().setPos(Point(0, B_radius, 0));
+
+        Vector* B_Speed = NULL;
+        B_Speed = new Vector(-0.005, 0, 0.005);
+        Balle->getAnim().setSpeed(*B_Speed);
+
+        Vector* B_Accel = new Vector(0.0001, 0, 0);
+        Balle->getAnim().setAccel(*B_Accel);
+
+        forms_list[number_of_forms] = Balle;
+        number_of_forms++;
 
         // Get first "current time"
         previous_time = SDL_GetTicks();
@@ -400,6 +410,12 @@ int main(int argc, char* args[])
                             murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() + P_Omega_normalise);
                         }
                         break;
+                    case SDLK_f:
+                        camAlpha -= 5;
+                        break;
+                    case SDLK_s:
+                        camAlpha += 5;
+                        break;
                     case SDLK_ESCAPE: // Quit the program when Escape key is pressed
                         quit = true;
                         break;
@@ -423,7 +439,7 @@ int main(int argc, char* args[])
             }
 
             // Render the scene
-            render(forms_list, camera_position);
+            render(forms_list, camera_position,camAlpha);
 
             // Update window screen
             SDL_GL_SwapWindow(gWindow);

@@ -4,6 +4,7 @@
 #include "geometry.h"
 #include "animation.h"
 
+class Hole; // Forward declaration of Hole class
 
 class Color
 {
@@ -19,7 +20,7 @@ const Color GREEN(0.0f, 1.0f, 0.0f);
 const Color YELLOW(1.0f, 1.0f, 0.0f);
 const Color WHITE(1.0f, 1.0f, 1.0f);
 const Color ORANGE(1.0f, 0.65f, 0.0f);
-
+const Color BLACK(0.0f, 0.0f, 0.0f);
 
 // Generic class to render and animate an object
 class Form
@@ -62,11 +63,29 @@ class Cube_face : public Form
 private:
     Vector vdir1, vdir2;
     double length, width;
+    Hole* hole;
 public:
     Cube_face(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1),
           Point org = Point(), double l = 1.0, double w = 1.0,
           Color cl = Color());
+    void setHole(Hole* h);
     void update(double delta_t);
+    void render();
+};
+
+class Plateau : public Form
+{
+};
+
+// Hole class definition
+class Hole : public Form
+{
+public:
+    Point position; 
+    double radius;  
+    Hole(Point pos = Point(), double r = 1);
+    Point getPosition() const {return position;}
+    void update(double delta_t) override {}
     void render();
 };
 

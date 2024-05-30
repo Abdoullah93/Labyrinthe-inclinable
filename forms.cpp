@@ -73,6 +73,10 @@ Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color 
     col = cl;
 }
 
+void Cube_face::setHole(Hole* h)
+{
+	hole = h;
+}
 
 void Cube_face::update(double delta_t)
 {
@@ -99,4 +103,32 @@ void Cube_face::render()
         glVertex3d(p4.x, p4.y, p4.z);
     }
     glEnd();
+
+    // Render the hole if it exists
+
+    if (hole != nullptr) {
+        glPushMatrix();
+        // Translate to the hole's position relative to the cube face
+        glTranslatef(hole->getPosition().x, hole->getPosition().y, hole->getPosition().z);
+        hole->render();
+        glPopMatrix();
+    }
+    
+}
+
+Hole :: Hole(Point pos, double r) 
+{
+	position = pos;
+	radius = r;
+}
+
+void Hole::render()
+{
+    GLUquadric* quad;
+    quad = gluNewQuadric();
+    Form::render();
+    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);// Rotate the disk 90 degrees around the x-axis to make it horizontal
+    glColor3f(0.0f, 0.0f, 0.0f); // the hole is black
+    gluDisk(quad, 0, radius, 32, 1);
+    gluDeleteQuadric(quad);
 }
