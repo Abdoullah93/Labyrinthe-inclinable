@@ -22,6 +22,7 @@ void Form::render()
     Point org = anim.getPos();
     glTranslated(org.x, org.y, org.z);
     glColor3f(col.r, col.g, col.b);
+    glRotated(anim.getTheta(),0,1,0);
 }
 
 
@@ -34,7 +35,7 @@ Sphere::Sphere(double r, Color cl)
 
 void Sphere::update(double delta_t)
 {
-    // Complete this part
+    anim.setTheta(anim.getTheta()+1);
 }
 
 
@@ -44,7 +45,8 @@ void Sphere::render()
 
     quad = gluNewQuadric();
 
-    // Complete this part
+    Form::render();
+    gluSphere(quad, radius, 10, 10);
 
     gluDeleteQuadric(quad);
 }
