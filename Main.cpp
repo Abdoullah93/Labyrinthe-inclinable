@@ -38,10 +38,23 @@ bool initGL();
 void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t);
 
 // Renders scene to the screen
-void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos);
+void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos);
 
 // Frees media and shuts down SDL
 void close(SDL_Window** window);
+
+
+// Definition des parametres des objets et de l'environnement
+// Dans le code il faut faire reference a ces constants la, PAS DE VALEURS NUMERIQUES
+// (pour le calcul de l'origine par exemple)
+const double P_length = 3;
+const double P_width = 2;
+const double B_radius = 0.1;
+const Color P_color = RED;
+const Color B_color = BLUE;
+const int P_Omega_normalise = 5;
+
+
 
 
 /***************************************************************************/
@@ -49,188 +62,191 @@ void close(SDL_Window** window);
 /***************************************************************************/
 bool init(SDL_Window** window, SDL_GLContext* context)
 {
-	// Initialization flag
-	bool success = true;
+    // Initialization flag
+    bool success = true;
 
-	// Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
-	{
-		std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
-		success = false;
-	}
-	else
-	{
-		// Use OpenGL 2.1
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    // Initialize SDL
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
+        success = false;
+    }
+    else
+    {
+        // Use OpenGL 2.1
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
-		// Create window
-		*window = SDL_CreateWindow("TP intro OpenGL / SDL 2", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-		if (*window == NULL)
-		{
-			std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
-			success = false;
-		}
-		else
-		{
-			// Create context
-			*context = SDL_GL_CreateContext(*window);
-			if (*context == NULL)
-			{
-				std::cout << "OpenGL context could not be created! SDL Error: " << SDL_GetError() << std::endl;
-				success = false;
-			}
-			else
-			{
-				// Use Vsync
-				if (SDL_GL_SetSwapInterval(1) < 0)
-				{
-					std::cout << "Warning: Unable to set VSync! SDL Error: " << SDL_GetError() << std::endl;
-				}
+        // Create window
+        *window = SDL_CreateWindow("TP intro OpenGL / SDL 2", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+        if (*window == NULL)
+        {
+            std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
+            success = false;
+        }
+        else
+        {
+            // Create context
+            *context = SDL_GL_CreateContext(*window);
+            if (*context == NULL)
+            {
+                std::cout << "OpenGL context could not be created! SDL Error: " << SDL_GetError() << std::endl;
+                success = false;
+            }
+            else
+            {
+                // Use Vsync
+                if (SDL_GL_SetSwapInterval(1) < 0)
+                {
+                    std::cout << "Warning: Unable to set VSync! SDL Error: " << SDL_GetError() << std::endl;
+                }
 
-				// Initialize OpenGL
-				if (!initGL())
-				{
-					std::cout << "Unable to initialize OpenGL!" << std::endl;
-					success = false;
-				}
-			}
-		}
-	}
+                // Initialize OpenGL
+                if (!initGL())
+                {
+                    std::cout << "Unable to initialize OpenGL!" << std::endl;
+                    success = false;
+                }
+            }
+        }
+    }
 
-	return success;
+    return success;
 }
 
 
 bool initGL()
 {
-	bool success = true;
-	GLenum error = GL_NO_ERROR;
+    bool success = true;
+    GLenum error = GL_NO_ERROR;
 
-	// Initialize Projection Matrix
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+    // Initialize Projection Matrix
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
 
-	// Set the viewport : use all the window to display the rendered scene
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    // Set the viewport : use all the window to display the rendered scene
+    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	// Fix aspect ratio and depth clipping planes
-	gluPerspective(40.0, (GLdouble)SCREEN_WIDTH / SCREEN_HEIGHT, 1.0, 100.0);
-
-
-	// Initialize Modelview Matrix
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	// Initialize clear color : black with no transparency
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-	// Activate Z-Buffer
-	glEnable(GL_DEPTH_TEST);
+    // Fix aspect ratio and depth clipping planes
+    gluPerspective(40.0, (GLdouble)SCREEN_WIDTH / SCREEN_HEIGHT, 1.0, 100.0);
 
 
-	// Lighting basic configuration and activation
-	const GLfloat light_ambient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
-	const GLfloat light_diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	const GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
+    // Initialize Modelview Matrix
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
-	const GLfloat mat_ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
-	const GLfloat mat_diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-	const GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	const GLfloat high_shininess[] = { 100.0f };
+    // Initialize clear color : black with no transparency
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHT1);
-	glEnable(GL_NORMALIZE);
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_LIGHTING);
-
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-
-	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+    // Activate Z-Buffer
+    glEnable(GL_DEPTH_TEST);
 
 
-	// Check for error
-	error = glGetError();
-	if (error != GL_NO_ERROR)
-	{
-		std::cout << "Error initializing OpenGL!  " << gluErrorString(error) << std::endl;
-		success = false;
-	}
+    // Lighting basic configuration and activation
+    const GLfloat light_ambient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+    const GLfloat light_diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    const GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
 
-	return success;
+    const GLfloat mat_ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+    const GLfloat mat_diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+    const GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    const GLfloat high_shininess[] = { 100.0f };
+
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+
+
+    // Check for error
+    error = glGetError();
+    if (error != GL_NO_ERROR)
+    {
+        std::cout << "Error initializing OpenGL!  " << gluErrorString(error) << std::endl;
+        success = false;
+    }
+
+    return success;
 }
 
 void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
 {
-	// Update the list of forms
-	unsigned short i = 0;
-	while (formlist[i] != NULL)
-	{
-		formlist[i]->update(delta_t);
-		i++;
-	}
+    // Update the list of forms
+    unsigned short i = 0;
+    while (formlist[i] != NULL)
+    {
+        formlist[i]->update(delta_t);
+        i++;
+    }
 }
 
-void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
+void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos)
 {
-	// Clear color buffer and Z-Buffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Clear color buffer and Z-Buffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Initialize Modelview Matrix
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+    // Initialize Modelview Matrix
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
-	// Set the camera position and parameters
-	gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-	// Isometric view
-	glRotated(-45, 0, 1, 0);
-	glRotated(30, 1, 0, -1);
+    // Set the camera position and parameters
+    gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    // Isometric view
+    glRotated(-45, 0, 1, 0);
+    glRotated(30, 1, 0, -1);
 
-	// X, Y and Z axis
-	glPushMatrix(); // Preserve the camera viewing point for further forms
-	// Render the coordinates system
-	glBegin(GL_LINES);
-	{
-		glColor3f(1.0f, 0.0f, 0.0f);
-		glVertex3i(0, 0, 0);
-		glVertex3i(1, 0, 0);
-		glColor3f(0.0f, 1.0f, 0.0f);
-		glVertex3i(0, 0, 0);
-		glVertex3i(0, 1, 0);
-		glColor3f(0.0f, 0.0f, 1.0f);
-		glVertex3i(0, 0, 0);
-		glVertex3i(0, 0, 1);
-	}
-	glEnd();
-	glPopMatrix(); // Restore the camera viewing point for next object
+    // X, Y and Z axis
+    glPushMatrix(); // Preserve the camera viewing point for further forms
+    // Render the coordinates system
+    glBegin(GL_LINES);
+    {
+        // X rouge
+        // Y vert
+        // Z bleue
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glVertex3i(0, 0, 0);
+        glVertex3i(1, 0, 0);
+        glColor3f(0.0f, 1.0f, 0.0f);
+        glVertex3i(0, 0, 0);
+        glVertex3i(0, 1, 0);
+        glColor3f(0.0f, 0.0f, 1.0f);
+        glVertex3i(0, 0, 0);
+        glVertex3i(0, 0, 1);
+    }
+    glEnd();
+    glPopMatrix(); // Restore the camera viewing point for next object
 
-	// Render the list of forms
-	unsigned short i = 0;
-	while (formlist[i] != NULL)
-	{
-		glPushMatrix(); // Preserve the camera viewing point for further forms
-		formlist[i]->render();
-		glPopMatrix(); // Restore the camera viewing point for next object
-		i++;
-	}
+    // Render the list of forms
+    unsigned short i = 0;
+    while (formlist[i] != NULL)
+    {
+        glPushMatrix(); // Preserve the camera viewing point for further forms
+        formlist[i]->render();
+        glPopMatrix(); // Restore the camera viewing point for next object
+        i++;
+    }
 }
 
 void close(SDL_Window** window)
 {
-	//Destroy window
-	SDL_DestroyWindow(*window);
-	*window = NULL;
+    //Destroy window
+    SDL_DestroyWindow(*window);
+    *window = NULL;
 
-	//Quit SDL subsystems
-	SDL_Quit();
+    //Quit SDL subsystems
+    SDL_Quit();
 }
 
 
@@ -239,102 +255,183 @@ void close(SDL_Window** window)
 /***************************************************************************/
 int main(int argc, char* args[])
 {
-	// The window we'll be rendering to
-	SDL_Window* gWindow = NULL;
+    // The window we'll be rendering to
+    SDL_Window* gWindow = NULL;
 
-	// OpenGL context
-	SDL_GLContext gContext;
+    // OpenGL context
+    SDL_GLContext gContext;
 
 
-	// Start up SDL and create window
-	if (!init(&gWindow, &gContext))
-	{
-		std::cout << "Failed to initialize!" << std::endl;
-	}
-	else
-	{
-		// Main loop flag
-		bool quit = false;
-		Uint32 current_time, previous_time, elapsed_time;
+    // Start up SDL and create window
+    if (!init(&gWindow, &gContext))
+    {
+        std::cout << "Failed to initialize!" << std::endl;
+    }
+    else
+    {
+        // Main loop flag
+        bool quit = false;
+        Uint32 current_time, previous_time, elapsed_time;
 
-		// Event handler
-		SDL_Event event;
+        // Event handler
+        SDL_Event event;
 
-		// Camera position
-		Point camera_position(0, 0.0, 5.0);
+        // Camera position
+        Point camera_position(0, 0.0, 5.0);
 
-		// The forms to render
-		Form* forms_list[MAX_FORMS_NUMBER];
-		unsigned short number_of_forms = 0, i;
-		for (i = 0; i < MAX_FORMS_NUMBER; i++)
-		{
-			forms_list[i] = NULL;
-		}
-		// Create here specific forms and add them to the list...
-		// Don't forget to update the actual number_of_forms !
-		Cube_face *pFace = NULL;
-		pFace = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
-		forms_list[number_of_forms] = pFace;
-		number_of_forms++;
+        // The forms to render
+        Form* forms_list[MAX_FORMS_NUMBER];
+        unsigned short number_of_forms = 0, i;
+        for (i = 0; i < MAX_FORMS_NUMBER; i++)
+        {
+            forms_list[i] = NULL;
+        }
+        // Create here specific forms and add them to the list...
+        // Don't forget to update the actual number_of_forms !
+        /*
+        Cube_face *pFace = NULL;
+                // Create the remaining faces of the cube
+                pFace = new Cube_face(Vector(0, 1, 0), Vector(0, 0, 1), Point(-0.5, -0.5, -0.5), 1, 1, YELLOW);
+                forms_list[number_of_forms] = pFace;
+                number_of_forms++;
 
-		// Get first "current time"
-		previous_time = SDL_GetTicks();
-		// While application is running
-		while (!quit)
-		{
-			// Handle events on queue
-			while (SDL_PollEvent(&event) != 0)
-			{
-				int x = 0, y = 0;
-				SDL_Keycode key_pressed = event.key.keysym.sym;
+        Sphere *pSphere = NULL;
+        pSphere = new Sphere(0.5, RED, Point(1, 1, 1));
+        forms_list[number_of_forms] = pSphere;
+        number_of_forms++;
+        */
 
-				switch (event.type)
-				{
-					// User requests quit
-				case SDL_QUIT:
-					quit = true;
-					break;
-				case SDL_KEYDOWN:
-					// Handle key pressed with current mouse position
-					SDL_GetMouseState(&x, &y);
+        // Creer le plateau centré à l'origine (pour l'instant c'est une planche)
+        Cube_face* Plateau = NULL;
+        Plateau = new Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), Point(-P_width / 2, 0, -P_length / 2), P_width, P_length, P_color);
+        forms_list[number_of_forms] = Plateau;
+        number_of_forms++;
 
-					switch (key_pressed)
-					{
-						// Quit the program when 'q' or Escape keys are pressed
-					case SDLK_q:
-					case SDLK_ESCAPE:
-						quit = true;
-						break;
+        // Creer la balle et la placer sur le plateau (une vitesse et une acceleration sont données pour tester)
+        Sphere* Balle = NULL;
+        Balle = new Sphere(B_radius, B_color);
+        Balle->getAnim().setPos(Point(0, B_radius, 0));
 
-					default:
-						break;
-					}
-					break;
-				default:
-					break;
-				}
-			}
+        Vector* B_Speed = NULL;
+        B_Speed = new Vector(-0.005, 0, 0.005);
+        Balle->getAnim().setSpeed(*B_Speed);
 
-			// Update the scene
-			current_time = SDL_GetTicks(); // get the elapsed time from SDL initialization (ms)
-			elapsed_time = current_time - previous_time;
-			if (elapsed_time > ANIM_DELAY)
-			{
-				previous_time = current_time;
-				update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
-			}
 
-			// Render the scene
-			render(forms_list, camera_position);
+        Vector* B_Accel = new Vector(0.0001, 0, 0);
+        Balle->getAnim().setAccel(*B_Accel);
 
-			// Update window screen
-			SDL_GL_SwapWindow(gWindow);
-		}
-	}
+        forms_list[number_of_forms] = Balle;
+        number_of_forms++;
 
-	// Free resources and close SDL
-	close(&gWindow);
+        //Creer les murs du plateau
+        Cube_face* Mur1 = NULL;
+        Mur1 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-P_width / 2, 0, -P_length / 2), P_width, 0.1, WHITE);
+        forms_list[number_of_forms] = Mur1;
+        number_of_forms++;
 
-	return 0;
+        Cube_face* Mur2 = NULL;
+        Mur2 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-P_width / 2, 0, P_length / 2), P_width, 0.1, YELLOW);
+        forms_list[number_of_forms] = Mur2;
+        number_of_forms++;
+
+        Cube_face* Mur3 = NULL;
+        Mur3 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(-P_width / 2, 0, -P_length / 2), P_length, 0.1, GREEN);
+        forms_list[number_of_forms] = Mur3;
+        number_of_forms++;
+
+        Cube_face* Mur4 = NULL;
+        Mur4 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(P_width / 2, 0, -P_length / 2), P_length, 0.1, ORANGE);
+        forms_list[number_of_forms] = Mur4;
+        number_of_forms++;
+
+        Form* murs_list[4] = { Mur1, Mur2, Mur3, Mur4 };
+
+        // Get first "current time"
+        previous_time = SDL_GetTicks();
+        // While application is running
+        while (!quit)
+        {
+            // Handle events on queue
+            while (SDL_PollEvent(&event) != 0)
+            {
+                int x = 0, y = 0;
+                SDL_Keycode key_pressed = event.key.keysym.sym;
+
+                switch (event.type)
+                {
+                    // User requests quit
+                case SDL_QUIT:
+                    quit = true;
+                    break;
+                case SDL_KEYDOWN:
+                    // Handle key pressed with current mouse position
+                    SDL_GetMouseState(&x, &y);
+
+                    // Commande d'inclinaison du plateau
+                    // IL FAUT FAIRE DE SORTE POUR AVOIR PLUSIEUR TOUCHES QUI FONCTIONNENT
+                    // EN MEME TEMPS
+                    switch (key_pressed)
+                    {
+                    case SDLK_UP:
+                        Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
+                        for (int i = 0; i < 4; i++)
+                        {
+                            murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() - P_Omega_normalise);
+                        }
+                        break;
+                    case SDLK_DOWN:
+                        Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
+                        for (int i = 0; i < 4; i++)
+                        {
+                            murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() + P_Omega_normalise);
+                        }
+                        break;
+                    case SDLK_RIGHT:
+                        Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
+                        for (int i = 0; i < 4; i++)
+                        {
+                            murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() - P_Omega_normalise);
+                        }
+                        break;
+                    case SDLK_LEFT:
+                        Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
+                        for (int i = 0; i < 4; i++)
+                        {
+                            murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() + P_Omega_normalise);
+                        }
+                        break;
+                    case SDLK_ESCAPE: // Quit the program when Escape key is pressed
+                        quit = true;
+                        break;
+
+                    default:
+                        break;
+                    }
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            // Update the scene
+            current_time = SDL_GetTicks(); // get the elapsed time from SDL initialization (ms)
+            elapsed_time = current_time - previous_time;
+            if (elapsed_time > ANIM_DELAY)
+            {
+                previous_time = current_time;
+                update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
+            }
+
+            // Render the scene
+            render(forms_list, camera_position);
+
+            // Update window screen
+            SDL_GL_SwapWindow(gWindow);
+        }
+    }
+
+    // Free resources and close SDL
+    close(&gWindow);
+
+    return 0;
 }
-
