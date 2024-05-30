@@ -192,7 +192,7 @@ void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
 	}
 }
 
-void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
+void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos, double camAlpha)
 {
 	// Clear color buffer and Z-Buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -206,6 +206,10 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
 	// Isometric view
 	glRotated(-45, 0, 1, 0);
 	glRotated(30, 1, 0, -1);
+
+	//Rotation of the camer (dillusion)
+	glRotated(camAlpha, 0, 1, 0);
+
 
 	// X, Y and Z axis
 	glPushMatrix(); // Preserve the camera viewing point for further forms
@@ -261,6 +265,7 @@ int main(int argc, char* args[])
 	// OpenGL context
 	SDL_GLContext gContext;
 
+	double camAlpha = 0.0;
 
 	// Start up SDL and create window
 	if (!init(&gWindow, &gContext))
@@ -357,59 +362,53 @@ int main(int argc, char* args[])
 				int x = 0, y = 0;
 				SDL_Keycode key_pressed = event.key.keysym.sym;
 
-				switch (event.type)
+				if (event.type == SDL_QUIT)
 				{
-					// User requests quit
-				case SDL_QUIT:
-					quit = true;
-					break;
-				case SDL_KEYDOWN:
-					// Handle key pressed with current mouse position
-					SDL_GetMouseState(&x, &y);
+					quit = true; // Exit the loop after this iteration
+				}
 
-					// Commande d'inclinaison du plateau
-					// IL FAUT FAIRE DE SORTE POUR AVOIR PLUSIEUR TOUCHES QUI FONCTIONNENT
-					// EN MEME TEMPS
-					switch (key_pressed)
-					{						
-					case SDLK_UP:
-						Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
-						for(int i = 0; i < 4; i++)
-						{
-							murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() - P_Omega_normalise);
-						}
-						break;
-					case SDLK_DOWN:
-						Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
-						for(int i = 0; i < 4; i++)
-						{
-							murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() + P_Omega_normalise);
-						}
-						break;
-					case SDLK_RIGHT:
-						Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
-						for(int i = 0; i < 4; i++)
-						{
-							murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() - P_Omega_normalise);
-						}
-						break;
-					case SDLK_LEFT:
-						Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
-						for(int i = 0; i < 4; i++)
-						{
-							murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() + P_Omega_normalise);
-						}
-						break;
-					case SDLK_ESCAPE: // Quit the program when Escape key is pressed
-						quit = true;
-						break;
+				const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 
-					default:
-						break;
+				if (currentKeyStates[SDL_SCANCODE_UP])
+				{
+					Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
+					for(int i = 0; i < 4; i++)
+					{
+						murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() - P_Omega_normalise);
 					}
-					break;
-				default:
-					break;
+				}
+				if (currentKeyStates[SDL_SCANCODE_DOWN])
+				{
+					Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
+					for(int i = 0; i < 4; i++)
+					{
+						murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() + P_Omega_normalise);
+					}
+				}
+				if (currentKeyStates[SDL_SCANCODE_RIGHT])
+				{
+					Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
+					for(int i = 0; i < 4; i++)
+					{
+						murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() - P_Omega_normalise);
+					}
+				}
+				if (currentKeyStates[SDL_SCANCODE_LEFT])
+				{
+					Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
+					for(int i = 0; i < 4; i++)
+					{
+						murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() + P_Omega_normalise);
+					}
+				}
+				if (currentKeyStates[SDL_SCANCODE_F]) {
+					camAlpha -= 5;
+				}
+				if (currentKeyStates[SDL_SCANCODE_S]) {
+					camAlpha += 5;
+				}
+				if (currentKeyStates[SDL_SCANCODE_ESCAPE]) {
+					quit = true;
 				}
 			}
 
@@ -423,7 +422,7 @@ int main(int argc, char* args[])
 			}
 
 			// Render the scene
-			render(forms_list, camera_position);
+			render(forms_list, camera_position, camAlpha);
 
 			// Update window screen
 			SDL_GL_SwapWindow(gWindow);
