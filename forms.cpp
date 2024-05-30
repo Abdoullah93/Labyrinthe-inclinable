@@ -20,6 +20,12 @@ void Form::render()
     // Point of view for rendering
     // Common for all Forms
     Point org = anim.getPos();
+
+    // Rotation autour l'origine
+    // Pour faire une rotation autour une axe il faut 
+    // faire la translation d'abord et apres la rotation
+    glRotated(anim.getTheta(), 1, 0, 0);
+    glRotated(anim.getPhi(), 0, 0, 1);
     glTranslated(org.x, org.y, org.z);
     glColor3f(col.r, col.g, col.b);
 }
@@ -34,20 +40,24 @@ Sphere::Sphere(double r, Color cl)
 
 void Sphere::update(double delta_t)
 {
-    // Complete this part
+    anim.setSpeed(anim.getSpeed() + anim.getAccel());
+    // Mise à jour de la position en fonction de la vitesse
+    Point org = anim.getPos();
+    org.translate(anim.getSpeed());
+    anim.setPos(org);
 }
 
 
 void Sphere::render()
 {
-    GLUquadric *quad;
+    GLUquadric* quad;
 
     quad = gluNewQuadric();
-
-    // Complete this part
-
+    Form::render();
+    gluSphere(quad, radius, 32, 32);  // On se prend pas la tete, c'est pour dessiner la sphere
     gluDeleteQuadric(quad);
 }
+
 
 
 Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color cl)
@@ -62,8 +72,9 @@ Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color 
 
 
 void Cube_face::update(double delta_t)
-{
-    // Complete this part
+{   
+
+
 }
 
 

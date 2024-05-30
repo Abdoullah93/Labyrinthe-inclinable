@@ -44,6 +44,19 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos);
 void close(SDL_Window** window);
 
 
+// Definition des parametres des objets et de l'environnement
+// Dans le code il faut faire reference a ces constants la, PAS DE VALEURS NUMERIQUES
+// (pour le calcul de l'origine par exemple)
+const double P_length = 3;
+const double P_width = 2;
+const double B_radius = 0.1;
+const Color P_color = RED;
+const Color B_color = BLUE;
+const int P_Omega_normalise = 5;
+
+
+
+
 /***************************************************************************/
 /* Functions implementations                                               */
 /***************************************************************************/
@@ -63,7 +76,7 @@ bool init(SDL_Window** window, SDL_GLContext* context)
 		// Use OpenGL 2.1
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-		//Salut
+
 		// Create window
 		*window = SDL_CreateWindow("TP intro OpenGL / SDL 2", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 		if (*window == NULL)
@@ -271,11 +284,36 @@ int main(int argc, char* args[])
 			forms_list[i] = NULL;
 		}
 		// Create here specific forms and add them to the list...
-		// Don't forget to update the actual number_of_forms !
+		// Don't forget to update the actual number_of_forms ! 
+		/*
 		Cube_face *pFace = NULL;
 		pFace = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
 		forms_list[number_of_forms] = pFace;
 		number_of_forms++;
+		*/
+		// Creer le plateau centré à l'origine (pour l'instant c'est une planche)
+		Cube_face* Plateau = NULL;
+		Plateau = new Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), Point(-P_width/2, 0, -P_length/2),  P_width, P_length, P_color);
+		forms_list[number_of_forms] = Plateau;
+		number_of_forms++;
+
+		// Creer la balle et la placer sur le plateau (une vitesse et une acceleration sont données pour tester)
+		Sphere* Balle = NULL;
+		Balle = new Sphere(B_radius, B_color);
+		Balle->getAnim().setPos(Point (0, B_radius, 0));
+
+		Vector* B_Speed = NULL;
+		B_Speed = new Vector(-0.005, 0, 0.005);
+		Balle->getAnim().setSpeed(*B_Speed);
+
+
+		Vector* B_Accel = new Vector(0.0001, 0, 0);
+		Balle->getAnim().setAccel(*B_Accel);
+		
+		forms_list[number_of_forms] = Balle;
+		number_of_forms++;
+
+
 
 		// Get first "current time"
 		previous_time = SDL_GetTicks();
@@ -298,11 +336,24 @@ int main(int argc, char* args[])
 					// Handle key pressed with current mouse position
 					SDL_GetMouseState(&x, &y);
 
+					// Commande d'inclinaison du plateau
+					// IL FAUT FAIRE DE SORTE POUR AVOIR PLUSIEUR TOUCHES QUI FONCTIONNENT
+					// EN MEME TEMPS
 					switch (key_pressed)
-					{
-						// Quit the program when 'q' or Escape keys are pressed
-					case SDLK_q:
-					case SDLK_ESCAPE:
+					{						
+					case SDLK_UP:
+						Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
+						break;
+					case SDLK_DOWN:
+						Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
+						break;
+					case SDLK_RIGHT:
+						Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
+						break;
+					case SDLK_LEFT:
+						Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
+						break;
+					case SDLK_ESCAPE: // Quit the program when Escape key is pressed
 						quit = true;
 						break;
 
