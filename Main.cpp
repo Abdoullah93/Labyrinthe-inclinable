@@ -300,6 +300,7 @@ int main(int argc, char* args[])
 		forms_list[number_of_forms] = pSphere;
 		number_of_forms++;
 		*/
+
 		// Creer le plateau centré à l'origine (pour l'instant c'est une planche)
 		Cube_face* Plateau = NULL;
 		Plateau = new Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), Point(-P_width/2, 0, -P_length/2),  P_width, P_length, P_color);
@@ -322,7 +323,28 @@ int main(int argc, char* args[])
 		forms_list[number_of_forms] = Balle;
 		number_of_forms++;
 
+		//Creer les murs du plateau
+		Cube_face* Mur1 = NULL;
+		Mur1 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-P_width / 2, 0, -P_length / 2), P_width, 0.1, WHITE);
+		forms_list[number_of_forms] = Mur1;
+		number_of_forms++;
 
+		Cube_face* Mur2 = NULL;
+		Mur2 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-P_width / 2, 0, P_length / 2), P_width, 0.1, YELLOW);
+		forms_list[number_of_forms] = Mur2;
+		number_of_forms++;
+
+		Cube_face* Mur3 = NULL;
+		Mur3 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(-P_width / 2, 0, -P_length / 2), P_length, 0.1, GREEN);
+		forms_list[number_of_forms] = Mur3;
+		number_of_forms++;
+
+		Cube_face* Mur4 = NULL;
+		Mur4 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(P_width / 2, 0, -P_length / 2), P_length, 0.1, ORANGE);
+		forms_list[number_of_forms] = Mur4;
+		number_of_forms++;
+
+		Form* murs_list[4] = { Mur1, Mur2, Mur3, Mur4 };
 
 		// Get first "current time"
 		previous_time = SDL_GetTicks();
@@ -352,15 +374,31 @@ int main(int argc, char* args[])
 					{						
 					case SDLK_UP:
 						Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
+						for(int i = 0; i < 4; i++)
+						{
+							murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() - P_Omega_normalise);
+						}
 						break;
 					case SDLK_DOWN:
 						Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
+						for(int i = 0; i < 4; i++)
+						{
+							murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() + P_Omega_normalise);
+						}
 						break;
 					case SDLK_RIGHT:
 						Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
+						for(int i = 0; i < 4; i++)
+						{
+							murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() - P_Omega_normalise);
+						}
 						break;
 					case SDLK_LEFT:
 						Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
+						for(int i = 0; i < 4; i++)
+						{
+							murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() + P_Omega_normalise);
+						}
 						break;
 					case SDLK_ESCAPE: // Quit the program when Escape key is pressed
 						quit = true;

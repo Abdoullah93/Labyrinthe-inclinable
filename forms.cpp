@@ -28,7 +28,6 @@ void Form::render()
     glRotated(anim.getPhi(), 0, 0, 1);
     glTranslated(org.x, org.y, org.z);
     glColor3f(col.r, col.g, col.b);
-    glRotated(anim.getPhi(),0.0, 1.0, 0.0);
 }
 
 
