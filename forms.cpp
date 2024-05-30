@@ -99,3 +99,39 @@ void Cube_face::render()
     }
     glEnd();
 }
+
+Plateau::Plateau(double size, Color cl)
+{
+    Point origin(0, 0, 0);
+    double half_size = size / 2.0;
+
+    
+    // Bottom face
+    faces.push_back(Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-half_size, -half_size, -half_size), size, size, cl));
+    // Top face
+    faces.push_back(Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-half_size, half_size, -half_size), size, size, cl));
+    // Front face
+    faces.push_back(Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), Point(-half_size, -half_size, -half_size), size, size, cl));
+    // Back face
+    faces.push_back(Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), Point(-half_size, -half_size, half_size), size, size, cl));
+    // Left face
+    faces.push_back(Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(-half_size, -half_size, -half_size), size, size, cl));
+    // Right face
+    faces.push_back(Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(half_size, -half_size, -half_size), size, size, cl));
+}
+
+void Plateau::update(double delta_t)
+{
+    for (auto& face : faces)
+    {
+        face.update(delta_t);
+    }
+}
+
+void Plateau::render()
+{
+    for (auto& face : faces)
+    {
+        face.render();
+    }
+}

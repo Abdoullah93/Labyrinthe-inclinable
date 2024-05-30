@@ -3,7 +3,7 @@
 
 #include "geometry.h"
 #include "animation.h"
-
+#include <vector>
 
 class Color
 {
@@ -71,17 +71,15 @@ public:
 };
 
 
+class Plateau : public Form
+{
+private:
+    std::vector<Cube_face> faces;
 
-
-
-
-
-
-
-
-
-
-
-
+public:
+    Plateau(double size = 1.0, Color cl = Color());
+    void update(double delta_t);
+    void render();
+};
 
 #endif // FORMS_H_INCLUDED
