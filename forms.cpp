@@ -109,7 +109,7 @@ void Cube_face::render()
     if (hole != nullptr) {
         glPushMatrix();
         // Translate to the hole's position relative to the cube face
-        glTranslatef(hole->getPosition().x, hole->getPosition().y, hole->getPosition().z);
+        glTranslatef(hole->getPosition().x, hole->getPosition().y+0.001, hole->getPosition().z);
         hole->render();
         glPopMatrix();
     }
