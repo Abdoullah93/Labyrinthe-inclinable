@@ -10,7 +10,7 @@ using namespace std;
 
 
 //BB Rotation de vecteur V autour l'axe A (qui est un vecteur) d'angle Alpha
-//le vecteur A doit etre normalisé
+//le vecteur A doit etre normalisÃ©
 Vector Rotation(Vector V, Vector A, double Alpha) {
     Alpha = Alpha * M_PI / 180;
     Vector V_rot = cos(Alpha) * V + sin(Alpha) * (A ^ V) + (1 - cos(Alpha)) * (A * V) * A;
@@ -41,10 +41,11 @@ void Form::render()
 }
 
 
-Sphere::Sphere(double r, Color cl)
+Sphere::Sphere(double r, Color cl, Point org)
 {
     radius = r;
     col = cl;
+    //anim.setPos(org);
 }
 
 
@@ -59,7 +60,7 @@ void Sphere::update(double delta_t)
     Vector a = g * Rotation(v1, v2, anim.getPhi()) * Rotation(v1, v2, anim.getPhi()) + g * Rotation(v2, v1, anim.getTheta()) * Rotation(v2, v1, anim.getTheta());
     anim.setAccel(0.0001 * a);
     anim.setSpeed(anim.getSpeed() * Rotation(v1, v2, anim.getPhi()) * Rotation(v1, v2, anim.getPhi()) + anim.getSpeed() * Rotation(v2, v1, anim.getTheta()) * Rotation(v2, v1, anim.getTheta()) + anim.getAccel());
-    // Mise à jour de la position en fonction de la vitesse
+    // Mise Ã  jour de la position en fonction de la vitesse
 
 }
 
@@ -71,6 +72,7 @@ void Sphere::render()
     quad = gluNewQuadric();
     Form::render();
     gluSphere(quad, radius, 32, 32);  // On se prend pas la tete, c'est pour dessiner la sphere
+
     gluDeleteQuadric(quad);
 }
 
@@ -89,7 +91,6 @@ Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color 
 
 void Cube_face::update(double delta_t)
 {   
-
 
 }
 

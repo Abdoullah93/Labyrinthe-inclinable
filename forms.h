@@ -3,7 +3,7 @@
 
 #include "geometry.h"
 #include "animation.h"
-
+#include <vector>
 
 class Color
 {
@@ -48,7 +48,7 @@ private:
     // => no center required here, information is stored in the anim object
     double radius;
 public:
-    Sphere(double r = 1.0, Color cl = Color());
+    Sphere(double r = 1.0, Color cl = Color(), Point org = Point());
     double getRadius() const {return radius;}
     void setRadius(double r) {radius = r;}
     void update(double delta_t);
@@ -71,17 +71,15 @@ public:
 };
 
 
+class Plateau : public Form
+{
+private:
+    std::vector<Cube_face> faces;
 
-
-
-
-
-
-
-
-
-
-
-
+public:
+    Plateau(double size = 1.0, Color cl = Color());
+    void update(double delta_t);
+    void render();
+};
 
 #endif // FORMS_H_INCLUDED
