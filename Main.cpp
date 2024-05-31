@@ -192,7 +192,7 @@ void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
 	}
 }
 
-void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos, double camAlpha)
+void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos, double camAlpha, double camTheta)
 {
 	// Clear color buffer and Z-Buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -209,6 +209,7 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos, double camAl
 
 	//Rotation of the camer (dillusion)
 	glRotated(camAlpha, 0, 1, 0);
+	glRotated(camTheta, 1, 0, 1);
 
 
 	// X, Y and Z axis
@@ -266,6 +267,7 @@ int main(int argc, char* args[])
 	SDL_GLContext gContext;
 
 	double camAlpha = 0.0;
+	double camTheta = 0.0;
 
 	// Start up SDL and create window
 	if (!init(&gWindow, &gContext))
@@ -369,7 +371,7 @@ int main(int argc, char* args[])
 
 				const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 
-				if (currentKeyStates[SDL_SCANCODE_UP])
+				if (currentKeyStates[SDL_SCANCODE_UP] && Plateau->getAnim().getTheta() >= -15)
 				{
 					Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
 					for(int i = 0; i < 4; i++)
@@ -377,7 +379,7 @@ int main(int argc, char* args[])
 						murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() - P_Omega_normalise);
 					}
 				}
-				if (currentKeyStates[SDL_SCANCODE_DOWN])
+				if (currentKeyStates[SDL_SCANCODE_DOWN] && Plateau->getAnim().getTheta() <= 15)
 				{
 					Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
 					for(int i = 0; i < 4; i++)
@@ -385,7 +387,7 @@ int main(int argc, char* args[])
 						murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() + P_Omega_normalise);
 					}
 				}
-				if (currentKeyStates[SDL_SCANCODE_RIGHT])
+				if (currentKeyStates[SDL_SCANCODE_RIGHT] && Plateau->getAnim().getPhi()>=-15)
 				{
 					Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
 					for(int i = 0; i < 4; i++)
@@ -393,7 +395,7 @@ int main(int argc, char* args[])
 						murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() - P_Omega_normalise);
 					}
 				}
-				if (currentKeyStates[SDL_SCANCODE_LEFT])
+				if (currentKeyStates[SDL_SCANCODE_LEFT] && Plateau->getAnim().getPhi() <= 15)
 				{
 					Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
 					for(int i = 0; i < 4; i++)
@@ -422,7 +424,7 @@ int main(int argc, char* args[])
 			}
 
 			// Render the scene
-			render(forms_list, camera_position, camAlpha);
+			render(forms_list, camera_position, camAlpha, camTheta);
 
 			// Update window screen
 			SDL_GL_SwapWindow(gWindow);
