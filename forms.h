@@ -75,6 +75,16 @@ public:
 
 class Plateau : public Form
 {
+    private:
+	double length, width;
+    Point origin;
+    public:
+        Cube_face* bords[5];
+        Plateau(double l = 1.0, double w = 1.0,Point origine = Point(), Point holePos = Point(), double holeWidth = 0.1, Color cl = RED);
+        void setLength(double l) {length = l;}
+        void setWidth(double w) {width = w;}
+        void update(double delta_t);
+        void render();
 };
 
 // Hole class definition

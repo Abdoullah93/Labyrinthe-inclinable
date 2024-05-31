@@ -61,7 +61,52 @@ void Sphere::render()
     gluDeleteQuadric(quad);
 }
 
+Plateau :: Plateau(double l, double w, Point pointOrigine, Point holePos, double holeWidth, Color cl)
+{
+	length = l;
+	width = w;
+	col = cl;
+    //Creer la base du plateau
+    Cube_face* Base = NULL;
+    Base = new Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), pointOrigine, w, l, cl);
+    bords[0] = Base;
+    //Creer les murs du plateau
+    Cube_face* Mur1 = NULL;
+    Mur1 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), pointOrigine, w, l, cl);
+    bords[1] = Mur1;
+    Cube_face* Mur2 = NULL;
+    Mur2 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(pointOrigine.x, pointOrigine.y, pointOrigine.z + l), w, l, cl);
+    bords[2] = Mur2;
+    Cube_face* Mur3 = NULL;
+    Mur3 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), pointOrigine, w, l, cl);
+    bords[3] = Mur3;
+    Cube_face* Mur4 = NULL;
+    Mur4 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(pointOrigine.x+w, pointOrigine.y, pointOrigine.z ), w, l, cl);
+    bords[4] = Mur4;
 
+    //Creer un trous dans plateau
+    Hole* hole1 = NULL;
+    hole1 = new Hole(holePos, holeWidth);
+    Base->setHole(hole1);
+
+  
+}
+
+void Plateau:: update(double delta_t)
+{
+	for (int i = 0; i < 5; i++)
+	{
+	    bords[i]->update(delta_t);
+	}
+}
+
+void Plateau::render()
+{
+	for (int i = 0; i < 5; i++)
+	{
+		bords[i]->render();
+	}
+}
 
 Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color cl)
 {

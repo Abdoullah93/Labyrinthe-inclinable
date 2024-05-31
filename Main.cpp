@@ -291,21 +291,8 @@ int main(int argc, char* args[])
         {
             forms_list[i] = NULL;
         }
-        // Create here specific forms and add them to the list...
-        // Don't forget to update the actual number_of_forms !
+
         /*
-        Cube_face *pFace = NULL;
-                // Create the remaining faces of the cube
-                pFace = new Cube_face(Vector(0, 1, 0), Vector(0, 0, 1), Point(-0.5, -0.5, -0.5), 1, 1, YELLOW);
-                forms_list[number_of_forms] = pFace;
-                number_of_forms++;
-
-        Sphere *pSphere = NULL;
-        pSphere = new Sphere(0.5, RED, Point(1, 1, 1));
-        forms_list[number_of_forms] = pSphere;
-        number_of_forms++;
-        */
-
         // Creer le plateau centré à l'origine (pour l'instant c'est une planche)
         Cube_face* Plateau = NULL;
         Plateau = new Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), Point(-P_width / 2, 0, -P_length / 2), P_width, P_length, P_color);
@@ -339,7 +326,13 @@ int main(int argc, char* args[])
         Hole* Trou1 = NULL;
         Trou1 = new Hole(Point(P_width / 2, 0, P_length / 2), 0.1);
         Plateau->setHole(Trou1);
+        */
 
+        // Creer le plateau centré à l'origine (pour l'instant c'est une planche)
+        Plateau* P1 = NULL;
+        P1 = new Plateau (2, 3, Point(-1, 0, -1.5), Point(0,0,0), 0.1, WHITE);
+        forms_list[number_of_forms] = P1;
+        number_of_forms++;
 
         // Creer la balle et la placer sur le plateau (une vitesse et une acceleration sont données pour tester)
         Sphere* Balle = NULL;
@@ -383,31 +376,31 @@ int main(int argc, char* args[])
                     switch (key_pressed)
                     {
                     case SDLK_UP:
-                        Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
+                        P1->getAnim().setTheta(P1->getAnim().getTheta() - P_Omega_normalise);
                         for (int i = 0; i < 4; i++)
                         {
-                            murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() - P_Omega_normalise);
+                            //murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() - P_Omega_normalise);
                         }
                         break;
                     case SDLK_DOWN:
-                        Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
+                        P1->getAnim().setTheta(P1->getAnim().getTheta() + P_Omega_normalise);
                         for (int i = 0; i < 4; i++)
                         {
-                            murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() + P_Omega_normalise);
+                            //murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() + P_Omega_normalise);
                         }
                         break;
                     case SDLK_RIGHT:
-                        Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
+                        P1->getAnim().setPhi(P1->getAnim().getPhi() - P_Omega_normalise);
                         for (int i = 0; i < 4; i++)
                         {
-                            murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() - P_Omega_normalise);
+                            //murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() - P_Omega_normalise);
                         }
                         break;
                     case SDLK_LEFT:
-                        Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
+                        P1->getAnim().setPhi(P1->getAnim().getPhi() + P_Omega_normalise);
                         for (int i = 0; i < 4; i++)
                         {
-                            murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() + P_Omega_normalise);
+                            //murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() + P_Omega_normalise);
                         }
                         break;
                     case SDLK_f:
