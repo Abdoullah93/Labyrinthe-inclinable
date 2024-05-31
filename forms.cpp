@@ -22,7 +22,8 @@ void Form::render()
     Point org = anim.getPos();
     glTranslated(org.x, org.y, org.z);
     glColor3f(col.r, col.g, col.b);
-    glRotated(anim.getTheta(),0,1,0);
+    glRotated(anim.getTheta(), 0, 1, 0);
+    glRotated(anim.getPhi(), 0, 0, 1);
 }
 
 
@@ -35,7 +36,24 @@ Sphere::Sphere(double r, Color cl)
 
 void Sphere::update(double delta_t)
 {
+
+    //Recup tous les forces en Newton de ton objet 
+    //double masse = 1.0;
+    //double g = 9.81;
+    //Vector Fg(0, -masse*g, 0);//
+    //Vector Fn(0, masse*g, 0);//force normale doit etre fait plus haut
+    //Vector sumForce = Fg + Fn; //somme des forces = masse * acceleration
+
+    //Vector acc = sumForce * (1/masse);
+    //Vector speed =  anim.getSpeed() + acc.integral(delta_t);
+    //Point pos = speed.integral(delta_t);
+    //pos = pos+ anim.getPos();
+
     anim.setTheta(anim.getTheta()+1);
+    anim.setSpeed(anim.getSpeed() + anim.getAccel());
+    Point org = anim.getPos();
+    org.translate(anim.getSpeed());
+    anim.setPos(org);
 }
 
 

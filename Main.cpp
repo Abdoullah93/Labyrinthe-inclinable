@@ -43,6 +43,17 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos);
 // Frees media and shuts down SDL
 void close(SDL_Window** window);
 
+// Definition des parametres des objets et de l'environnement
+// Dans le code il faut faire reference a ces constants la, PAS DE VALEURS NUMERIQUES
+// (pour le calcul de l'origine par exemple)
+const double P_length = 3;
+const double P_width = 2;
+const double B_radius = 0.1;
+const Color P_color = RED;
+const Color B_color = BLUE;
+const int P_Omega_normalise = 5;
+const double g = 9.81;
+const double B_mass = 1.0;
 
 /***************************************************************************/
 /* Functions implementations                                               */
@@ -171,9 +182,30 @@ bool initGL()
 void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
 {
 	// Update the list of forms
+
+
+
 	unsigned short i = 0;
 	while (formlist[i] != NULL)
 	{
+		//switch (formlist[i]->getType())
+		//{
+			//case SPHERE:
+				//if(formlist[i]->getAnim().getPos().y <= 0)//Alors on est sur le sol
+				//{
+			        //Alors changer la force normale
+					//Vector Fn = (0,B_mass * g, 0);
+					//formlist[i]->getAnim().setFn(Fn);
+				//}
+				//else {
+					//alors chute libre
+					//Vector Fn = (0, 0, 0);
+					//formlist[i]->getAnim().setFn(Fn);
+				//}
+			//break;
+		//default:
+			//break;
+		//}
 		formlist[i]->update(delta_t);
 		i++;
 	}
@@ -273,8 +305,23 @@ int main(int argc, char* args[])
 		// Create here specific forms and add them to the list...
 		// Don't forget to update the actual number_of_forms !
 		Cube_face *pFace = NULL;
-		pFace = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
+		pFace = new Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), Point(-0.5, 0, -1), 1, 1, ORANGE);
 		forms_list[number_of_forms] = pFace;
+		number_of_forms++;
+
+		Sphere* Balle = NULL;
+		Balle = new Sphere(B_radius, B_color);
+		Balle->getAnim().setPos(Point(0, B_radius, 0));
+
+		Vector* B_Speed = NULL;
+		B_Speed = new Vector(0, 0, -0.005);
+		Balle->getAnim().setSpeed(*B_Speed);
+
+
+		Vector* B_Accel = new Vector(0, 0, 0);
+		Balle->getAnim().setAccel(*B_Accel);
+
+		forms_list[number_of_forms] = Balle;
 		number_of_forms++;
 
 		// Get first "current time"
