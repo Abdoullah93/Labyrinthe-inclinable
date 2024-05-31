@@ -9,6 +9,16 @@
 using namespace std;
 
 
+//BB Rotation de vecteur V autour l'axe A (qui est un vecteur) d'angle Alpha
+//le vecteur A doit etre normalisé
+Vector Rotation(Vector V, Vector A, double Alpha) {
+    Alpha = Alpha * M_PI / 180;
+    Vector V_rot = cos(Alpha) * V + sin(Alpha) * (A ^ V) + (1 - cos(Alpha)) * (A * V) * A;
+    return V_rot;
+}
+
+
+
 void Form::update(double delta_t)
 {
     // Nothing to do here, animation update is done in child class method
@@ -39,12 +49,18 @@ Sphere::Sphere(double r, Color cl)
 
 
 void Sphere::update(double delta_t)
-{
-    anim.setSpeed(anim.getSpeed() + anim.getAccel());
-    // Mise à jour de la position en fonction de la vitesse
+{   
+    const Vector g(0, -9.8, 0);
+    const Vector v1(1, 0, 0);
+    const Vector v2(0, 0, 1);
     Point org = anim.getPos();
     org.translate(anim.getSpeed());
     anim.setPos(org);
+    Vector a = g * Rotation(v1, v2, anim.getPhi()) * Rotation(v1, v2, anim.getPhi()) + g * Rotation(v2, v1, anim.getTheta()) * Rotation(v2, v1, anim.getTheta());
+    anim.setAccel(0.0001 * a);
+    anim.setSpeed(anim.getSpeed() * Rotation(v1, v2, anim.getPhi()) * Rotation(v1, v2, anim.getPhi()) + anim.getSpeed() * Rotation(v2, v1, anim.getTheta()) * Rotation(v2, v1, anim.getTheta()) + anim.getAccel());
+    // Mise à jour de la position en fonction de la vitesse
+
 }
 
 
@@ -98,3 +114,6 @@ void Cube_face::render()
     }
     glEnd();
 }
+
+
+

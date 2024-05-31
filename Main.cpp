@@ -11,6 +11,7 @@
 // Module for generating and rendering forms
 #include "forms.h"
 
+
 using namespace std;
 
 
@@ -44,6 +45,9 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos);
 void close(SDL_Window** window);
 
 
+
+
+
 // Definition des parametres des objets et de l'environnement
 // Dans le code il faut faire reference a ces constants la, PAS DE VALEURS NUMERIQUES
 // (pour le calcul de l'origine par exemple)
@@ -53,7 +57,8 @@ const double B_radius = 0.1;
 const Color P_color = RED;
 const Color B_color = BLUE;
 const int P_Omega_normalise = 5;
-
+const double Bord_width = 0.1;
+const Vector g(0, -9.8, 0);
 
 
 
@@ -293,7 +298,9 @@ int main(int argc, char* args[])
 		*/
 		// Creer le plateau centré à l'origine (pour l'instant c'est une planche)
 		Cube_face* Plateau = NULL;
-		Plateau = new Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), Point(-P_width/2, 0, -P_length/2),  P_width, P_length, P_color);
+		Vector v1(1, 0, 0);
+		Vector v2(0, 0, 1);
+		Plateau = new Cube_face(v1, v2, Point(-P_width / 2, 0, -P_length / 2), P_width, P_length, P_color);
 		forms_list[number_of_forms] = Plateau;
 		number_of_forms++;
 
@@ -302,17 +309,38 @@ int main(int argc, char* args[])
 		Balle = new Sphere(B_radius, B_color);
 		Balle->getAnim().setPos(Point (0, B_radius, 0));
 
-		Vector* B_Speed = NULL;
-		B_Speed = new Vector(-0.005, 0, 0.005);
+		
+		Vector* B_Speed = new Vector(0, 0, 0);
 		Balle->getAnim().setSpeed(*B_Speed);
 
-
-		Vector* B_Accel = new Vector(0.0001, 0, 0);
+		Vector* B_Accel = new Vector(0, 0, 0);
 		Balle->getAnim().setAccel(*B_Accel);
 		
 		forms_list[number_of_forms] = Balle;
 		number_of_forms++;
 
+		//Creer les murs du plateau
+		Cube_face* Mur1 = NULL;
+		Mur1 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-P_width / 2, 0, -P_length / 2), P_width, Bord_width, WHITE);
+		forms_list[number_of_forms] = Mur1;
+		number_of_forms++;
+
+		Cube_face* Mur2 = NULL;
+		Mur2 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-P_width / 2, 0, P_length / 2), P_width, Bord_width, YELLOW);
+		forms_list[number_of_forms] = Mur2;
+		number_of_forms++;
+
+		Cube_face* Mur3 = NULL;
+		Mur3 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(-P_width / 2, 0, -P_length / 2), P_length, Bord_width, GREEN);
+		forms_list[number_of_forms] = Mur3;
+		number_of_forms++;
+
+		Cube_face* Mur4 = NULL;
+		Mur4 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(P_width / 2, 0, -P_length / 2), P_length, Bord_width, ORANGE);
+		forms_list[number_of_forms] = Mur4;
+		number_of_forms++;
+
+		Form* murs_list[4] = { Mur1, Mur2, Mur3, Mur4 };
 
 
 		// Get first "current time"
@@ -343,15 +371,35 @@ int main(int argc, char* args[])
 					{						
 					case SDLK_UP:
 						Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
+						Balle->getAnim().setTheta(Balle->getAnim().getTheta() - P_Omega_normalise);
+						for (int i = 0; i < 4; i++)
+						{
+							murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() - P_Omega_normalise);
+						}
 						break;
 					case SDLK_DOWN:
 						Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
+						Balle->getAnim().setTheta(Balle->getAnim().getTheta() + P_Omega_normalise);
+						for (int i = 0; i < 4; i++)
+						{
+							murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() + P_Omega_normalise);
+						}
 						break;
 					case SDLK_RIGHT:
 						Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
+						Balle->getAnim().setPhi(Balle->getAnim().getPhi() - P_Omega_normalise);
+						for (int i = 0; i < 4; i++)
+						{
+							murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() - P_Omega_normalise);
+						}
 						break;
 					case SDLK_LEFT:
 						Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
+						Balle->getAnim().setPhi(Balle->getAnim().getPhi() + P_Omega_normalise);
+						for (int i = 0; i < 4; i++)
+						{
+							murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() + P_Omega_normalise);
+						}
 						break;
 					case SDLK_ESCAPE: // Quit the program when Escape key is pressed
 						quit = true;
