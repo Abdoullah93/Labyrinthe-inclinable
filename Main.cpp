@@ -57,7 +57,7 @@ const Color P_color = RED;
 const Color B_color = BLUE;
 const int P_Omega_normalise = 5;
 const int P_incline_limit = 30;
-const double Bord_width = 0.1;
+const double Bord_width = 0.2;
 const Vector g(0, -9.8, 0);
 
 
