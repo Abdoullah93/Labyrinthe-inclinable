@@ -134,7 +134,7 @@ void Cube_face::update(double delta_t)
 {   
     Vector v1 = getv1();
     Vector v2 = getv2();
-    printf("%f \n", v1 * v2);
+    //printf("%f \n", v1 * v2);
 }
 
 /*

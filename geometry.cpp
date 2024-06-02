@@ -55,6 +55,21 @@ double distance(Point p1, Point p2)
     return vect.norm();
 }
 
+void Point::operator+=(const Vector &v)
+{
+	x += v.x;
+	y += v.y;
+	z += v.z;
+}
+
+Point Point::operator+(const Vector &v) const
+{
+	Point res = *this;
+
+	res += v;
+
+	return res;
+}
 
 // Overloaded standard operators
 std::ostream& operator<<(std::ostream& os, const Coordinates& coord)
@@ -74,6 +89,17 @@ Vector operator+(const Vector &v1, const Vector &v2)
     return res;
 }
 
+Point operator+(const Point &p, const Vector &v)
+{
+	Point res = p;
+
+	res.x += v.x;
+	res.y += v.y;
+	res.z += v.z;
+
+	return res;
+}
+
 Vector operator-(const Vector &v)
 {
     Vector res;
@@ -83,6 +109,18 @@ Vector operator-(const Vector &v)
     res.z = -v.z;
 
     return res;
+}
+
+// Produit vectoriel
+Vector Vector::operator^(const Vector &v)
+{
+	Vector res;
+
+	res.x = y * v.z - z * v.y;
+	res.y = z * v.x - x * v.z;
+	res.z = x * v.y - y * v.x;
+
+	return res;
 }
 
 Vector operator-(const Vector &v1, const Vector &v2)

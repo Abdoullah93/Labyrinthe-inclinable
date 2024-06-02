@@ -63,6 +63,7 @@ class Cube_face : public Form
 private:
     Vector vdir1, vdir2;
     double length, width;
+    Point org;
 public:
     Cube_face(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1),
           Point org = Point(), double l = 1.0, double w = 1.0,
@@ -73,6 +74,11 @@ public:
     Vector getv2() const { return vdir2; }
     void setv1(Vector vect) { vdir1 = vect; }
     void setv2(Vector vect) { vdir2 = vect; }
+    double getLength() const { return length; }
+    double getWidth() const { return width; }
+    Point getOrg() const { return org; }
+    Point setOrg(Point pt) { org = pt; }
+
 };
 
 
