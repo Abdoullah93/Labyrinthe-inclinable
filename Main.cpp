@@ -334,7 +334,7 @@ int main(int argc, char* args[])
 		forms_list[number_of_forms] = Mur4;
 		number_of_forms++;
 
-		Form* murs_list[4] = { Mur1, Mur2, Mur3, Mur4 };
+		Cube_face* murs_list[4] = { Mur1, Mur2, Mur3, Mur4 };
 		// Creer la balle et la placer sur le plateau (une vitesse et une acceleration sont données pour tester)
 		Sphere* Balle = NULL;
 		Balle = new Sphere(B_radius, B_color);
@@ -387,6 +387,15 @@ int main(int argc, char* args[])
 						Plateau->setv2(Rotation(Plateau->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
 						Plateau->setv1(Rotation(Plateau->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
 						//Balle->getAnim().setTheta(Balle->getAnim().getTheta() - P_Omega_normalise);
+						Mur1->setv2(Rotation(Mur1->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
+						Mur1->setv1(Rotation(Mur1->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
+						Mur2->setv2(Rotation(Mur2->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
+						Mur2->setv1(Rotation(Mur2->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
+						Mur3->setv2(Rotation(Mur3->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
+						Mur3->setv1(Rotation(Mur3->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
+						Mur4->setv2(Rotation(Mur4->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
+						Mur4->setv1(Rotation(Mur4->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
+
 						/*for (int i = 0; i < 4; i++)
 						{
 							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
@@ -408,7 +417,14 @@ int main(int argc, char* args[])
 
 						new_pos.translate(pos_vecteur);
 						Balle->getAnim().setPos(new_pos);
-						
+						Mur1->setv2(Rotation(Mur1->getv2(), Vector(1, 0, 0), P_Omega_normalise));
+						Mur1->setv1(Rotation(Mur1->getv1(), Vector(1, 0, 0), P_Omega_normalise));
+						Mur2->setv2(Rotation(Mur2->getv2(), Vector(1, 0, 0), P_Omega_normalise));
+						Mur2->setv1(Rotation(Mur2->getv1(), Vector(1, 0, 0), P_Omega_normalise));
+						Mur3->setv2(Rotation(Mur3->getv2(), Vector(1, 0, 0), P_Omega_normalise));
+						Mur3->setv1(Rotation(Mur3->getv1(), Vector(1, 0, 0), P_Omega_normalise));
+						Mur4->setv2(Rotation(Mur4->getv2(), Vector(1, 0, 0), P_Omega_normalise));
+						Mur4->setv1(Rotation(Mur4->getv1(), Vector(1, 0, 0), P_Omega_normalise));
 						/*for (int i = 0; i < 4; i++)
 						{
 							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(1, 0, 0), P_Omega_normalise));
@@ -427,6 +443,15 @@ int main(int argc, char* args[])
 						new_pos.translate(pos_vecteur);
 						Balle->getAnim().setPos(new_pos);
 						
+						Mur1->setv1(Rotation(Mur1->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
+						Mur1->setv2(Rotation(Mur1->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
+						Mur2->setv1(Rotation(Mur2->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
+						Mur2->setv2(Rotation(Mur2->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
+						Mur3->setv1(Rotation(Mur3->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
+						Mur3->setv2(Rotation(Mur3->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
+						Mur4->setv1(Rotation(Mur4->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
+						Mur4->setv2(Rotation(Mur4->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
+
 						/*for (int i = 0; i < 4; i++)
 						{
 							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
@@ -445,6 +470,15 @@ int main(int argc, char* args[])
 						new_pos.translate(pos_vecteur);
 						Balle->getAnim().setPos(new_pos);
 						
+						Mur1->setv1(Rotation(Mur1->getv1(), Vector(0, 0, 1), P_Omega_normalise));
+						Mur1->setv2(Rotation(Mur1->getv2(), Vector(0, 0, 1), P_Omega_normalise));
+						Mur2->setv1(Rotation(Mur2->getv1(), Vector(0, 0, 1), P_Omega_normalise));
+						Mur2->setv2(Rotation(Mur2->getv2(), Vector(0, 0, 1), P_Omega_normalise));
+						Mur3->setv1(Rotation(Mur3->getv1(), Vector(0, 0, 1), P_Omega_normalise));
+						Mur3->setv2(Rotation(Mur3->getv2(), Vector(0, 0, 1), P_Omega_normalise));
+						Mur4->setv1(Rotation(Mur4->getv1(), Vector(0, 0, 1), P_Omega_normalise));
+						Mur4->setv2(Rotation(Mur4->getv2(), Vector(0, 0, 1), P_Omega_normalise));
+
 						/*for (int i = 0; i < 4; i++)
 						{
 							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(0, 0, 1), P_Omega_normalise));
