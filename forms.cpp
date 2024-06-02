@@ -30,13 +30,13 @@ void Form::render()
     // Point of view for rendering
     // Common for all Forms
     Point org = anim.getPos();
-
     // Rotation autour l'origine
     // Pour faire une rotation autour une axe il faut 
     // faire la translation d'abord et apres la rotation
     glRotated(anim.getTheta(), 1, 0, 0);
     glRotated(anim.getPhi(), 0, 0, 1);
     glTranslated(org.x, org.y, org.z);
+   
     glColor3f(col.r, col.g, col.b);
 }
 
@@ -55,13 +55,36 @@ void Sphere::update(double delta_t)
     const Vector v1(1, 0, 0);
     const Vector v2(0, 0, 1);
     Point org = anim.getPos();
+
+    //Vector v1_rotated = Rotation(v1, v2, anim.getPhi());
+    //Vector v2_rotated = Rotation(v2, v1, anim.getTheta());
+    //Vector a = (g * v1_rotated) * v1_rotated + (g * v2_rotated) * v2_rotated;
+    //anim.setAccel(0.001*a);
+    //anim.setSpeed(anim.getSpeed() * v1_rotated * v1_rotated + anim.getSpeed() * v2_rotated * v2_rotated + anim.getAccel());
     org.translate(anim.getSpeed());
     anim.setPos(org);
-    Vector a = g * Rotation(v1, v2, anim.getPhi()) * Rotation(v1, v2, anim.getPhi()) + g * Rotation(v2, v1, anim.getTheta()) * Rotation(v2, v1, anim.getTheta());
-    anim.setAccel(0.0001 * a);
-    anim.setSpeed(anim.getSpeed() * Rotation(v1, v2, anim.getPhi()) * Rotation(v1, v2, anim.getPhi()) + anim.getSpeed() * Rotation(v2, v1, anim.getTheta()) * Rotation(v2, v1, anim.getTheta()) + anim.getAccel());
-    // Mise à jour de la position en fonction de la vitesse
+    //anim.setSpeed(anim.getSpeed() + anim.getAccel());
 
+    /*
+    Point pos = anim.getPos();
+    Vector pos_vecteur(Point(0, 0, 0), pos);
+    
+    
+    pos_vecteur = Rotation(Rotation(pos_vecteur, v2, anim.getPhi()), v1, anim.getTheta());
+    anim.setTheta(0);
+    anim.setPhi(0);
+    
+    Point new_pos(0, 0, 0);
+    
+    new_pos.translate(pos_vecteur);
+    printf("x : %f      y : %f      z : %f \n", new_pos.x, new_pos.y, new_pos.z);
+    new_pos.translate(anim.getSpeed());
+
+
+    anim.setPos(new_pos);
+    //printf("%f \n", anim.getSpeed() * (v1_rotated ^ v2_rotated));
+    // Mise à jour de la position en fonction de la vitesse
+    */
 }
 
 
@@ -70,11 +93,29 @@ void Sphere::render()
     GLUquadric* quad;
 
     quad = gluNewQuadric();
+    
+    
     Form::render();
+    //Point org = anim.getPos();
+    //glTranslated(org.x, org.y, org.z);
+    //glColor3f(col.r, col.g, col.b);
+
     gluSphere(quad, radius, 32, 32);  // On se prend pas la tete, c'est pour dessiner la sphere
 
     gluDeleteQuadric(quad);
 }
+
+/*
+Vector Sphere::getPosVector()
+{
+    Point pos = getAnim().getPos();
+    Vector pos_vecteur(Point(0, 0, 0), pos);
+    pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), -P_Omega_normalise);
+    Point new_pos(0, 0, 0);
+    new_pos.translate(pos_vecteur);
+    Balle->getAnim().setPos(new_pos);
+}
+*/
 
 
 
@@ -91,10 +132,12 @@ Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color 
 
 void Cube_face::update(double delta_t)
 {   
-
+    Vector v1 = getv1();
+    Vector v2 = getv2();
+    printf("%f \n", v1 * v2);
 }
 
-
+/*
 void Cube_face::render()
 {
     Point p1 = Point();
@@ -105,6 +148,17 @@ void Cube_face::render()
     p4.translate(width*vdir2);
 
     Form::render();
+    //Point org = anim.getPos();
+
+    // Rotation autour l'origine
+    // Pour faire une rotation autour une axe il faut 
+    // faire la translation d'abord et apres la rotation
+    //glRotated(anim.getTheta(), 1, 0, 0);
+    //glRotated(anim.getPhi(), 0, 0, 1);
+    //glTranslated(org.x, org.y, org.z);
+    glColor3f(col.r, col.g, col.b);
+
+
 
     glBegin(GL_QUADS);
     {
@@ -115,6 +169,48 @@ void Cube_face::render()
     }
     glEnd();
 }
+*/
+
+
+void Cube_face::render()
+{
+    // Initialize points at the center
+    Point p1 = Point();
+    Point p2 = Point();
+    Point p3 = Point();
+    Point p4 = Point();
+
+    // Translate points from the center
+    p1.translate(-length / 2 * vdir1);
+    p1.translate(-width / 2 * vdir2);
+
+    p2.translate(length / 2 * vdir1);
+    p2.translate(-width / 2 * vdir2);
+
+    p3.translate(length / 2 * vdir1);
+    p3.translate(width / 2 * vdir2);
+
+    p4.translate(-length / 2 * vdir1);
+    p4.translate(width / 2 * vdir2);
+
+    Form::render();
+    // Rotation around the origin
+    // For rotation around an axis, translation must be done first, then rotation
+    // glRotated(anim.getTheta(), 1, 0, 0);
+    // glRotated(anim.getPhi(), 0, 0, 1);
+    // glTranslated(org.x, org.y, org.z);
+    glColor3f(col.r, col.g, col.b);
+
+    glBegin(GL_QUADS);
+    {
+        glVertex3d(p1.x, p1.y, p1.z);
+        glVertex3d(p2.x, p2.y, p2.z);
+        glVertex3d(p3.x, p3.y, p3.z);
+        glVertex3d(p4.x, p4.y, p4.z);
+    }
+    glEnd();
+}
+
 
 
 

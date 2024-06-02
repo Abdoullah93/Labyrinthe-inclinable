@@ -44,8 +44,7 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos);
 // Frees media and shuts down SDL
 void close(SDL_Window** window);
 
-
-
+Vector Rotation(Vector V, Vector A, double Alpha);
 
 
 // Definition des parametres des objets et de l'environnement
@@ -57,6 +56,7 @@ const double B_radius = 0.1;
 const Color P_color = RED;
 const Color B_color = BLUE;
 const int P_Omega_normalise = 5;
+const int P_incline_limit = 30;
 const double Bord_width = 0.1;
 const Vector g(0, -9.8, 0);
 
@@ -309,14 +309,14 @@ int main(int argc, char* args[])
 		Cube_face* Plateau = NULL;
 		Vector v1(1, 0, 0);
 		Vector v2(0, 0, 1);
-		Plateau = new Cube_face(v1, v2, Point(-P_width / 2, 0, -P_length / 2), P_width, P_length, P_color);
+		Plateau = new Cube_face(v1, v2, Point(0, 0, 0), P_width, P_length, P_color);
 		forms_list[number_of_forms] = Plateau;
 		number_of_forms++;
 
 		// Creer la balle et la placer sur le plateau (une vitesse et une acceleration sont données pour tester)
 		Sphere* Balle = NULL;
 		Balle = new Sphere(B_radius, B_color);
-		Balle->getAnim().setPos(Point (0, B_radius, 0));
+		Balle->getAnim().setPos(Point (0.5, B_radius, 0.5));
 
 		
 		Vector* B_Speed = new Vector(0, 0, 0);
@@ -327,6 +327,8 @@ int main(int argc, char* args[])
 		
 		forms_list[number_of_forms] = Balle;
 		number_of_forms++;
+
+		/*
 
 		//Creer les murs du plateau
 		Cube_face* Mur1 = NULL;
@@ -350,7 +352,7 @@ int main(int argc, char* args[])
 		number_of_forms++;
 
 		Form* murs_list[4] = { Mur1, Mur2, Mur3, Mur4 };
-
+		*/
 
 		// Get first "current time"
 		previous_time = SDL_GetTicks();
@@ -362,6 +364,11 @@ int main(int argc, char* args[])
 			{
 				int x = 0, y = 0;
 				SDL_Keycode key_pressed = event.key.keysym.sym;
+
+
+				Point pos = Balle->getAnim().getPos();
+				Vector pos_vecteur(Point(0, 0, 0), pos);
+				Point new_pos(0, 0, 0);
 
 				switch (event.type)
 				{
@@ -379,36 +386,73 @@ int main(int argc, char* args[])
 					switch (key_pressed)
 					{						
 					case SDLK_UP:
-						Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
-						Balle->getAnim().setTheta(Balle->getAnim().getTheta() - P_Omega_normalise);
+						//Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
+						Plateau->setv2(Rotation(Plateau->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
+						Plateau->setv1(Rotation(Plateau->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
+						//Balle->getAnim().setTheta(Balle->getAnim().getTheta() - P_Omega_normalise);
+
+
+						pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), -P_Omega_normalise);
+
+						new_pos.translate(pos_vecteur);
+						Balle->getAnim().setPos(new_pos);
+						/*
 						for (int i = 0; i < 4; i++)
 						{
 							murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() - P_Omega_normalise);
 						}
+						*/
 						break;
 					case SDLK_DOWN:
-						Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
-						Balle->getAnim().setTheta(Balle->getAnim().getTheta() + P_Omega_normalise);
+						//Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
+						Plateau->setv2(Rotation(Plateau->getv2(), Vector(1, 0, 0), P_Omega_normalise));
+						Plateau->setv1(Rotation(Plateau->getv1(), Vector(1, 0, 0), P_Omega_normalise));
+						//Balle->getAnim().setTheta(Balle->getAnim().getTheta() + P_Omega_normalise);
+
+						pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), P_Omega_normalise);
+
+						new_pos.translate(pos_vecteur);
+						Balle->getAnim().setPos(new_pos);
+						/*
 						for (int i = 0; i < 4; i++)
 						{
 							murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() + P_Omega_normalise);
 						}
+						*/
 						break;
 					case SDLK_RIGHT:
-						Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
-						Balle->getAnim().setPhi(Balle->getAnim().getPhi() - P_Omega_normalise);
+						//Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
+						Plateau->setv1(Rotation(Plateau->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
+						Plateau->setv2(Rotation(Plateau->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
+						//Balle->getAnim().setPhi(Balle->getAnim().getPhi() - P_Omega_normalise);
+
+						pos_vecteur = Rotation(pos_vecteur, Vector(0, 0, 1), -P_Omega_normalise);
+
+						new_pos.translate(pos_vecteur);
+						Balle->getAnim().setPos(new_pos);
+						/*
 						for (int i = 0; i < 4; i++)
 						{
 							murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() - P_Omega_normalise);
 						}
+						*/
 						break;
 					case SDLK_LEFT:
-						Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
-						Balle->getAnim().setPhi(Balle->getAnim().getPhi() + P_Omega_normalise);
+						//Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
+						Plateau->setv1(Rotation(Plateau->getv1(), Vector(0, 0, 1), P_Omega_normalise));
+						Plateau->setv2(Rotation(Plateau->getv2(), Vector(0, 0, 1), P_Omega_normalise));
+						//Balle->getAnim().setPhi(Balle->getAnim().getPhi() + P_Omega_normalise);
+
+						pos_vecteur = Rotation(pos_vecteur, Vector(0, 0, 1), P_Omega_normalise);
+
+						new_pos.translate(pos_vecteur);
+						Balle->getAnim().setPos(new_pos);
+						/*
 						for (int i = 0; i < 4; i++)
 						{
 							murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() + P_Omega_normalise);
 						}
+						*/
 						break;
 					case SDLK_ESCAPE: // Quit the program when Escape key is pressed
 						quit = true;
@@ -422,6 +466,73 @@ int main(int argc, char* args[])
 					break;
 				}
 			}
+			
+			Vector v1_rotated = Plateau->getv1();
+			Vector v2_rotated = Plateau->getv2();
+			Vector a = (g * v1_rotated) * v1_rotated + (g * v2_rotated) * v2_rotated;
+			Balle->getAnim().setAccel(0.0001 * a);
+			Balle->getAnim().setSpeed(Balle->getAnim().getSpeed()* v1_rotated* v1_rotated + Balle->getAnim().getSpeed() * v2_rotated * v2_rotated + Balle->getAnim().getAccel());
+
+			
+
+				/*
+			if (event.type == SDL_QUIT)
+			{
+				quit = true; // Exit the loop after this iteration
+			}
+
+			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+
+			if (currentKeyStates[SDL_SCANCODE_UP] && Plateau->getAnim().getTheta() >= -P_incline_limit)
+			{
+				Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
+				Balle->getAnim().setTheta(Balle->getAnim().getTheta() - P_Omega_normalise);
+				for (int i = 0; i < 4; i++)
+				{
+					murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() - P_Omega_normalise);
+				}
+			}
+			if (currentKeyStates[SDL_SCANCODE_DOWN] && Plateau->getAnim().getTheta() <= P_incline_limit)
+			{
+				Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
+				Balle->getAnim().setTheta(Balle->getAnim().getTheta() + P_Omega_normalise);
+				for (int i = 0; i < 4; i++)
+				{
+					murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() + P_Omega_normalise);
+				}
+			}
+			if (currentKeyStates[SDL_SCANCODE_RIGHT] && Plateau->getAnim().getPhi() >= -P_incline_limit)
+			{
+				Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
+				Balle->getAnim().setPhi(Balle->getAnim().getPhi() - P_Omega_normalise);
+				for (int i = 0; i < 4; i++)
+				{
+					murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() - P_Omega_normalise);
+				}
+			}
+			if (currentKeyStates[SDL_SCANCODE_LEFT] && Plateau->getAnim().getPhi() <= P_incline_limit)
+			{
+				Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
+				Balle->getAnim().setPhi(Balle->getAnim().getPhi() + P_Omega_normalise);
+				for (int i = 0; i < 4; i++)
+				{
+					murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() + P_Omega_normalise);
+				}
+			}
+			if (currentKeyStates[SDL_SCANCODE_F]) {
+				//camAlpha -= 5;
+			}
+			if (currentKeyStates[SDL_SCANCODE_S]) {
+				//camAlpha += 5;
+			}
+			if (currentKeyStates[SDL_SCANCODE_ESCAPE]) {
+				quit = true;
+			}
+			}
+			*/
+
+			
+
 
 			// Update the scene
 			current_time = SDL_GetTicks(); // get the elapsed time from SDL initialization (ms)
@@ -431,6 +542,8 @@ int main(int argc, char* args[])
 				previous_time = current_time;
 				update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
 			}
+
+
 
 			// Render the scene
 			render(forms_list, camera_position);

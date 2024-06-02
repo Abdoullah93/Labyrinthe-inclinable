@@ -53,6 +53,7 @@ public:
     void setRadius(double r) {radius = r;}
     void update(double delta_t);
     void render();
+    //Vector getPosVector();
 };
 
 
@@ -68,6 +69,10 @@ public:
           Color cl = Color());
     void update(double delta_t);
     void render();
+    Vector getv1() const { return vdir1; }
+    Vector getv2() const { return vdir2; }
+    void setv1(Vector vect) { vdir1 = vect; }
+    void setv2(Vector vect) { vdir2 = vect; }
 };
 
 
