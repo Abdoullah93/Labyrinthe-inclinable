@@ -76,15 +76,12 @@ public:
     void setv2(Vector vect) { vdir2 = vect; }
     double getLength() const { return length; }
     double getWidth() const { return width; }
-    Point getOrg() const { return org; }
-    void setOrg(Point pt) { org = pt; }
-
 };
 
 // A wall of cubes
 class Wall : public Form
 {
-    private:
+private:
 	Cube_face base; // Plateau
     Cube_face* wall_list[4]; // Liste des faces du mur (4)
 	double length_base, width_base, wall_height;
@@ -100,7 +97,6 @@ public:
 	double getWidthBase() const { return width_base; }
 	void setWallHeight(double h) { wall_height = h; }
 	double getWallHeight() const { return wall_height; }
-	Point getBaseOrg() const { return base.getOrg(); }
     // Change la position des murs en fonctions et effectue la rotation nécessaire
     void setWallPos(Vector vRot, double angle);
 };

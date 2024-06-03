@@ -221,32 +221,46 @@ Wall::Wall(Cube_face base, double wall_height, Color cl)
     this->width_base = base.getWidth();
     double P_width = base.getLength();
     double P_length = base.getWidth();
-    Point org = base.getOrg();
+    Point org = base.getAnim().getPos();
 
     // Creer les murs du plateau
     // Les murs 1 et 2 sont paralleles a l'axe x
     // Les murs 3 et 4 sont paralleles a l'axe z
     Cube_face* Mur1 = NULL;
-    Mur1 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), org + Point(0, wall_height / 2, -P_length / 2), P_width, wall_height, WHITE);
-    cout << "Mur1 : " << Mur1->getOrg().x << " " << Mur1->getOrg().y << " " << Mur1->getOrg().z << endl;
+    Point p1 = org + Vector(0, wall_height/2, -P_length/2);
+    Mur1 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), p1, P_width, wall_height, WHITE);
+    cout << "p1 : " << p1 << endl;
+    cout << "GetPos() Mur1 : " << Mur1->getAnim().getPos() << endl;
+
 
     Cube_face* Mur2 = NULL;
-    Mur2 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), org + Point(0, wall_height / 2, P_length / 2), P_width, wall_height, YELLOW);
+    Point p2 = org + Vector(0, wall_height/2, P_length);
+    Mur2 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), p2, P_width, wall_height, YELLOW);
+    cout << "p2 : " << p2 << endl;
+    cout << "GetPos() Mur2 : " << Mur2->getAnim().getPos() << endl;
 
 
     Cube_face* Mur3 = NULL;
-    Mur3 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), org + Point(-P_width / 2, wall_height / 2, 0), P_length, wall_height, GREEN);
-
+    Point p3 = org + Vector(-P_width/2,wall_height/2,-P_length/2);
+    Mur3 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), p3, P_length, wall_height, GREEN);
+    cout << "p3 : " << p3 << endl;
+    cout << "GetPos() Mur3 : " << Mur3->getAnim().getPos() << endl;
 
     Cube_face* Mur4 = NULL;
-    Mur4 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), org + Point(P_width / 2, wall_height / 2, 0), P_length, wall_height, ORANGE);
+    Point p4 = org + Vector(P_width, wall_height/2, -P_length/2);
+    Mur4 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), p4, P_length, wall_height, ORANGE);
+    cout << "p4 : " << p4 << endl;
+    cout << "GetPos() Mur4 : " << Mur4->getAnim().getPos() << endl;
 
 
     this->wall_list[0] = Mur1;
     this->wall_list[1] = Mur2;
     this->wall_list[2] = Mur3;
     this->wall_list[3] = Mur4;
-
+     cout << "Wall_list[0] : " << this->wall_list[0]->getAnim().getPos() << endl;
+     cout << "Wall_list[1] : " << this->wall_list[1]->getAnim().getPos() << endl;
+     cout << "Wall_list[2] : " << this->wall_list[2]->getAnim().getPos() << endl;
+     cout << "Wall_list[3] : " << this->wall_list[3]->getAnim().getPos() << endl;
 
 	/*vdir1 = 1.0 / v1.norm() * v1;
 	vdir2 = 1.0 / v2.norm() * v2;
