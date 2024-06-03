@@ -192,7 +192,7 @@ void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
     }
 }
 
-void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos, double camAlpha)
+void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos, double camAlpha, double scale)
 {
     // Clear color buffer and Z-Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -209,6 +209,8 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos, double camAl
 
     //Rotation of the camer (dillusion)
     glRotated(camAlpha, 0, 1, 0);
+
+    glScalef(scale, scale, scale); // scale the matrix
 
     // X, Y and Z axis
     glPushMatrix(); // Preserve the camera viewing point for further forms
@@ -267,6 +269,9 @@ int main(int argc, char* args[])
     // Camera parameters
     double camAlpha = 0.0;
 
+    //Zoom In ann Out parameters
+    double scale = 1.0;
+
     // Start up SDL and create window
     if (!init(&gWindow, &gContext))
     {
@@ -292,11 +297,11 @@ int main(int argc, char* args[])
             forms_list[i] = NULL;
         }
 
-        /*
+        
         // Creer le plateau centré à l'origine (pour l'instant c'est une planche)
-        Cube_face* Plateau = NULL;
-        Plateau = new Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), Point(-P_width / 2, 0, -P_length / 2), P_width, P_length, P_color);
-        forms_list[number_of_forms] = Plateau;
+        Cube_face* P1 = NULL;
+        P1 = new Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), Point(-P_width / 2, 0, -P_length / 2), P_width, P_length, P_color);
+        forms_list[number_of_forms] = P1;
         number_of_forms++;
 
         //Creer les murs du plateau
@@ -325,14 +330,16 @@ int main(int argc, char* args[])
         // 
         Hole* Trou1 = NULL;
         Trou1 = new Hole(Point(P_width / 2, 0, P_length / 2), 0.1);
-        Plateau->setHole(Trou1);
-        */
-
-        // Creer le plateau centré à l'origine (pour l'instant c'est une planche)
+        P1->setHole(Trou1);
+       
+ /*
+         // Creer le plateau centré à l'origine (pour l'instant c'est une planche)
         Plateau* P1 = NULL;
-        P1 = new Plateau (2, 3, Point(-1, 0, -1.5), Point(0,0,0), 0.1, WHITE);
+        P1 = new Plateau (3, 2, Point(0,0,0), Point(1,0,1.5), 0.1, WHITE);
         forms_list[number_of_forms] = P1;
         number_of_forms++;
+ */
+
 
         // Creer la balle et la placer sur le plateau (une vitesse et une acceleration sont données pour tester)
         Sphere* Balle = NULL;
@@ -409,6 +416,12 @@ int main(int argc, char* args[])
                     case SDLK_s:
                         camAlpha += 5;
                         break;
+                    case SDLK_e:
+                        scale += 0.25;
+                        break;
+                    case SDLK_d:
+                        scale -= 0.25;
+                        break;
                     case SDLK_ESCAPE: // Quit the program when Escape key is pressed
                         quit = true;
                         break;
@@ -432,7 +445,7 @@ int main(int argc, char* args[])
             }
 
             // Render the scene
-            render(forms_list, camera_position,camAlpha);
+            render(forms_list, camera_position,camAlpha, scale);
 
             // Update window screen
             SDL_GL_SwapWindow(gWindow);

@@ -61,27 +61,27 @@ void Sphere::render()
     gluDeleteQuadric(quad);
 }
 
-Plateau :: Plateau(double l, double w, Point pointOrigine, Point holePos, double holeWidth, Color cl)
+Plateau :: Plateau(double l, double w, Point org, Point holePos, double holeWidth, Color cl)
 {
 	length = l;
 	width = w;
 	col = cl;
     //Creer la base du plateau
     Cube_face* Base = NULL;
-    Base = new Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), pointOrigine, w, l, cl);
+    Base = new Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), org, -w/2, -l/2, ORANGE);
     bords[0] = Base;
     //Creer les murs du plateau
     Cube_face* Mur1 = NULL;
-    Mur1 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), pointOrigine, w, l, cl);
+    Mur1 = new Cube_face(Vector(0, 1, 0), Vector(1, 0, 0), Point(-l/2,0,-w/2), w, 0.1, RED);
     bords[1] = Mur1;
     Cube_face* Mur2 = NULL;
-    Mur2 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(pointOrigine.x, pointOrigine.y, pointOrigine.z + l), w, l, cl);
+    Mur2 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(org.x, org.y, org.z + l), w, 0.1, cl);
     bords[2] = Mur2;
     Cube_face* Mur3 = NULL;
-    Mur3 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), pointOrigine, w, l, cl);
+    Mur3 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), org, l, 0.1, cl);
     bords[3] = Mur3;
     Cube_face* Mur4 = NULL;
-    Mur4 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(pointOrigine.x+w, pointOrigine.y, pointOrigine.z ), w, l, cl);
+    Mur4 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(org.x+w, org.y, org.z ), l, 0.1, cl);
     bords[4] = Mur4;
 
     //Creer un trous dans plateau
