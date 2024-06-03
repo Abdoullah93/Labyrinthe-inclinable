@@ -31,6 +31,7 @@ Sphere::Sphere(double r, Color cl)
 {
     radius = r;
     col = cl;
+    type = SPHERE;
 }
 
 
@@ -38,16 +39,24 @@ void Sphere::update(double delta_t)
 {
 
     //Recup tous les forces en Newton de ton objet 
-    //double masse = 1.0;
-    //double g = 9.81;
-    //Vector Fg(0, -masse*g, 0);//
-    //Vector Fn(0, masse*g, 0);//force normale doit etre fait plus haut
-    //Vector sumForce = Fg + Fn; //somme des forces = masse * acceleration
+    double masse = 1;
+    double g = 9.81;
+    Vector Fg(0, -masse*g*0.01, 0);
+    Vector sumForce = Fg + anim.getFn(); //somme des forces = masse * acceleration
 
-    //Vector acc = sumForce * (1/masse);
-    //Vector speed =  anim.getSpeed() + acc.integral(delta_t);
-    //Point pos = speed.integral(delta_t);
-    //pos = pos+ anim.getPos();
+    Vector acc = sumForce / masse;
+    Vector newSpeed = anim.getSpeed() + acc.integral(delta_t);
+    anim.setSpeed(newSpeed);
+    cout << "vitesse = " <<anim.getSpeed() << endl;
+
+    // Mise à jour de la position en intégrant la vitesse sur le temps delta_t
+    Point newPos = anim.getPos();
+    newPos.translate(newSpeed.integral(delta_t));
+    if (newPos.y < radius)
+	{
+		newPos.y = radius;
+	}
+    anim.setPos(newPos);
 
     anim.setTheta(anim.getTheta()+1);
     anim.setSpeed(anim.getSpeed() + anim.getAccel());

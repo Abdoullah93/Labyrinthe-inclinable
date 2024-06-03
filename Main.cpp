@@ -53,7 +53,8 @@ const Color P_color = RED;
 const Color B_color = BLUE;
 const int P_Omega_normalise = 5;
 const double g = 9.81;
-const double B_mass = 1.0;
+const double B_mass = 1;
+double k = 0.2;
 
 /***************************************************************************/
 /* Functions implementations                                               */
@@ -188,24 +189,28 @@ void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
 	unsigned short i = 0;
 	while (formlist[i] != NULL)
 	{
-		//switch (formlist[i]->getType())
-		//{
-			//case SPHERE:
-				//if(formlist[i]->getAnim().getPos().y <= 0)//Alors on est sur le sol
-				//{
+		switch (formlist[i]->getType())
+		{
+			case SPHERE:
+				if(formlist[i]->getAnim().getPos().y <= B_radius)//Alors on est sur le sol
+				{
+					
 			        //Alors changer la force normale
-					//Vector Fn = (0,B_mass * g, 0);
-					//formlist[i]->getAnim().setFn(Fn);
-				//}
-				//else {
+					Vector Fn(0,B_mass * g * k, 0);
+					
+					k = 0.8 * k;
+					formlist[i]->getAnim().setSpeed(Vector(0, 0, 0));
+					formlist[i]->getAnim().setFn(Fn);
+				}
+				else {
 					//alors chute libre
-					//Vector Fn = (0, 0, 0);
-					//formlist[i]->getAnim().setFn(Fn);
-				//}
-			//break;
-		//default:
-			//break;
-		//}
+					Vector Fn = (0, 0, 0);
+					formlist[i]->getAnim().setFn(Fn);
+				}
+			break;
+		default:
+			break;
+		}
 		formlist[i]->update(delta_t);
 		i++;
 	}

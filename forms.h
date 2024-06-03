@@ -4,7 +4,7 @@
 #include "geometry.h"
 #include "animation.h"
 
-//enum FormType {SPHERE, CUBE_FACE};
+enum FormType {SPHERE, CUBE_FACE};
 
 class Color
 {
@@ -28,7 +28,7 @@ class Form
 protected:
     Color col;
     Animation anim;
-    //FormType type;
+    FormType type;
 public:
     Animation& getAnim() {return anim;}
     void setAnim(Animation ani) {anim = ani;}
@@ -39,7 +39,7 @@ public:
     virtual void update(double delta_t) = 0;
     // Virtual method : Form is a generic type, only setting color and reference position
     virtual void render();
-    //FormType getType() {return type;}
+    FormType getType() const {return type;}
 };
 
 
