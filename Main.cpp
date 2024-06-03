@@ -311,15 +311,7 @@ int main(int argc, char* args[])
 
 		Sphere* Balle = NULL;
 		Balle = new Sphere(B_radius, B_color);
-		Balle->getAnim().setPos(Point(0, B_radius, 0));
-
-		Vector* B_Speed = NULL;
-		B_Speed = new Vector(0, 0, -0.005);
-		Balle->getAnim().setSpeed(*B_Speed);
-
-
-		Vector* B_Accel = new Vector(0, 0, 0);
-		Balle->getAnim().setAccel(*B_Accel);
+		Balle->getAnim().setPos(Point(0, 1, 0));
 
 		forms_list[number_of_forms] = Balle;
 		number_of_forms++;

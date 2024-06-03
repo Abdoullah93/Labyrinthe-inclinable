@@ -3,7 +3,6 @@
 
 #include "geometry.h"
 #include "animation.h"
-#include "geometry.cpp"
 
 //enum FormType {SPHERE, CUBE_FACE};
 
