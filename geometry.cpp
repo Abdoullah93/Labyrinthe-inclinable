@@ -71,6 +71,15 @@ Point Point::operator+(const Vector &v) const
 	return res;
 }
 
+Point Point::operator+(const Point &p) const
+{
+	Point res = *this;
+
+	res += Vector(p.x, p.y, p.z);
+
+	return res;
+}
+
 // Overloaded standard operators
 std::ostream& operator<<(std::ostream& os, const Coordinates& coord)
 {

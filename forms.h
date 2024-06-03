@@ -77,9 +77,34 @@ public:
     double getLength() const { return length; }
     double getWidth() const { return width; }
     Point getOrg() const { return org; }
-    Point setOrg(Point pt) { org = pt; }
+    void setOrg(Point pt) { org = pt; }
 
 };
+
+// A wall of cubes
+class Wall : public Form
+{
+    private:
+	Cube_face base; // Plateau
+    Cube_face* wall_list[4]; // Liste des faces du mur (4)
+	double length_base, width_base, wall_height;
+public:
+    Wall(Cube_face base, double wall_height, Color cl = Color());// constructeur wall_list
+	void update(double delta_t);
+	void render();
+	void setBase(Cube_face cf) { base = cf; }
+	Cube_face getBase() const { return base; }
+	//void setWallList(Cube_face* cf, int i) { wall_list[i] = cf; }
+	Cube_face* getWallList() const { return *wall_list; }
+	double getLengthBase() const { return length_base; }
+	double getWidthBase() const { return width_base; }
+	void setWallHeight(double h) { wall_height = h; }
+	double getWallHeight() const { return wall_height; }
+	Point getBaseOrg() const { return base.getOrg(); }
+    // Change la position des murs en fonctions et effectue la rotation nécessaire
+    void setWallPos(Vector vRot, double angle);
+};
+
 
 
 class Plateau : public Form

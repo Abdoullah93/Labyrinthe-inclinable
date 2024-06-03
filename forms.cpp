@@ -211,6 +211,100 @@ void Cube_face::render()
     glEnd();
 }
 
+// Constructeur de la classe Wall
+// Construit les 4 murs du plateau en fonction du point d'origine et de la taille du plateau
+Wall::Wall(Cube_face base, double wall_height, Color cl)
+{
+    this->wall_height = wall_height;
+    this->base = base;
+    this->length_base = base.getLength();
+    this->width_base = base.getWidth();
+    double P_width = base.getLength();
+    double P_length = base.getWidth();
+    Point org = base.getOrg();
+
+    // Creer les murs du plateau
+    // Les murs 1 et 2 sont paralleles a l'axe x
+    // Les murs 3 et 4 sont paralleles a l'axe z
+    Cube_face* Mur1 = NULL;
+    Mur1 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), org + Point(0, wall_height / 2, -P_length / 2), P_width, wall_height, WHITE);
+    cout << "Mur1 : " << Mur1->getOrg().x << " " << Mur1->getOrg().y << " " << Mur1->getOrg().z << endl;
+
+    Cube_face* Mur2 = NULL;
+    Mur2 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), org + Point(0, wall_height / 2, P_length / 2), P_width, wall_height, YELLOW);
+
+
+    Cube_face* Mur3 = NULL;
+    Mur3 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), org + Point(-P_width / 2, wall_height / 2, 0), P_length, wall_height, GREEN);
+
+
+    Cube_face* Mur4 = NULL;
+    Mur4 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), org + Point(P_width / 2, wall_height / 2, 0), P_length, wall_height, ORANGE);
+
+
+    this->wall_list[0] = Mur1;
+    this->wall_list[1] = Mur2;
+    this->wall_list[2] = Mur3;
+    this->wall_list[3] = Mur4;
+
+
+	/*vdir1 = 1.0 / v1.norm() * v1;
+	vdir2 = 1.0 / v2.norm() * v2;
+	anim.setPos(org);
+	length = l;
+	width = w;
+	col = cl;*/
+}
+
+void Wall::update(double delta_t)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		wall_list[i]->update(delta_t);
+	}
+}
+
+void Wall::render()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		wall_list[i]->render();
+	}
+}
+
+// Change la position des murs et effectue la rotation nécessaire 
+// en fonction des vecteurs v1 et v2 du plateau et rotation en fonction de l'axe donnée en arg et de l'angle
+void Wall::setWallPos(Vector vRot, double angle)
+{
+    // Rotation des murs du plateau en fonction de l'axe donnée en arg
+    for (int i = 0; i < 4; i++)
+    {
+        this->wall_list[i]->setv2(Rotation(wall_list[i]->getv2(), vRot, angle));
+        this->wall_list[i]->setv1(Rotation(wall_list[i]->getv1(), vRot, angle));
+    }
+
+    // Translation des murs du plateau en fonction de la position du plateau
+    // Les murs 1 et 2 sont paralleles a l'axe x
+    // Les murs 3 et 4 sont paralleles a l'axe z
+    /*for (int i = 0; i < 4; i++)
+	{
+        double coeff = ((i == 0)||(i==2) ? -0.5 : 0.5);
+        Vector v1_v2 = (i<2 ? this->base.getv2() : this->base.getv1());
+        Vector v = this->base.getLength() * coeff * v1_v2 ;
+        Point newPos = this->base.getOrg() + v;
+		this->wall_list[i]->getAnim().setPos(newPos);
+	}*/
+    //this->wall_list[0]->getAnim().setPos(base.getAnim().getPos() + (this->wall_list[2]->getLength() * -0.5 * base.getv2()));
+    //this->wall_list[1]->getAnim().setPos(base.getAnim().getPos() + (this->wall_list[2]->getLength() * 0.5 * base.getv2()));
+    //this->wall_list[2]->getAnim().setPos(base.getAnim().getPos() + (this->wall_list[0]->getLength() * -0.5) * base.getv1());
+    //this->wall_list[3]->getAnim().setPos(base.getAnim().getPos() + (this->wall_list[0]->getLength() * 0.5) * base.getv1());
+
+    this->wall_list[0]->getAnim().setPos(base.getAnim().getPos() + (this->wall_list[0]->getLength() * 0) * base.getv1() + (this->wall_list[0]->getLength() * -0.5 * base.getv2()));
+    this->wall_list[1]->getAnim().setPos(base.getAnim().getPos() + (this->wall_list[0]->getLength() * 0) * base.getv1() + (this->wall_list[0]->getLength() * 0.5 * base.getv2()));
+    this->wall_list[2]->getAnim().setPos(base.getAnim().getPos() + (this->wall_list[0]->getLength() * -0.5) * base.getv1() + (this->wall_list[0]->getLength() * 0) * base.getv2());
+    this->wall_list[3]->getAnim().setPos(base.getAnim().getPos() + (this->wall_list[0]->getLength() * 0.5) * base.getv1() + (this->wall_list[0]->getLength() * 0) * base.getv2());
+
+}
 
 
 
