@@ -46,6 +46,8 @@ void close(SDL_Window** window);
 
 Vector Rotation(Vector V, Vector A, double Alpha);
 
+void collision(Sphere& Balle, Cube_face& mur);
+
 
 // Definition des parametres des objets et de l'environnement
 // Dans le code il faut faire reference a ces constants la, PAS DE VALEURS NUMERIQUES
@@ -338,7 +340,7 @@ int main(int argc, char* args[])
 		// Creer la balle et la placer sur le plateau (une vitesse et une acceleration sont données pour tester)
 		Sphere* Balle = NULL;
 		Balle = new Sphere(B_radius, B_color);
-		Balle->getAnim().setPos(Point (0.5, B_radius, 0.5));
+		Balle->getAnim().setPos(Point (0, B_radius, 0));
 
 		
 		Vector* B_Speed = new Vector(0, 0, 0);
@@ -395,13 +397,15 @@ int main(int argc, char* args[])
 							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
 						}
 
+						
 						pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), -P_Omega_normalise);
 						new_pos.translate(pos_vecteur);
 						Balle->getAnim().setPos(new_pos);
 
 						// Revoir height pour qu'il soit correct
-						Vector height = Plateau->getv2() ^ Plateau->getv1() * Bord_width / 2;
-						height = Vector(0, 0, 0);
+						Vector height = (Bord_width / 2) * (Plateau->getv2() ^ Plateau->getv1());
+						
+						//height = Vector(0, 0, 0);
 						Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
 						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
 						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
@@ -439,8 +443,8 @@ int main(int argc, char* args[])
 						{
 							murs_list[i]->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * (i % 2 == 1 ? -0.5 : 0.5)) * Plateau->getv1() + (Mur3->getLength() * (i < 2 ? -0.5 : 0.5) * Plateau->getv2()));
 						}*/
-						Vector height = Plateau->getv2() ^ Plateau->getv1() * Bord_width / 2;
-						height = Vector(0, 0, 0);
+						Vector height = (Bord_width / 2) * (Plateau->getv2() ^ Plateau->getv1());
+						
 						Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
 						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
 						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
@@ -469,8 +473,7 @@ int main(int argc, char* args[])
 						{
 							murs_list[i]->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * (i % 2 == 1 ? -0.5 : 0.5)) * Plateau->getv1() + (Mur3->getLength() * (i < 2 ? -0.5 : 0.5) * Plateau->getv2()));
 						}*/
-						Vector height = Plateau->getv2() ^ Plateau->getv1() * Bord_width / 2;
-						height = Vector(0, 0, 0);
+						Vector height = (Bord_width / 2) * (Plateau->getv2() ^ Plateau->getv1());
 						Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
 						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
 						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
@@ -499,8 +502,7 @@ int main(int argc, char* args[])
 						{
 							murs_list[i]->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * (i % 2 == 1 ? -0.5 : 0.5)) * Plateau->getv1() + (Mur3->getLength() * (i < 2 ? -0.5 : 0.5) * Plateau->getv2()));
 						}*/
-						Vector height = Plateau->getv2() ^ Plateau->getv1() * Bord_width / 2;
-						height = Vector(0, 0, 0);
+						Vector height = (Bord_width / 2) * (Plateau->getv2() ^ Plateau->getv1());
 						Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
 						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
 						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
@@ -520,10 +522,24 @@ int main(int argc, char* args[])
 				}
 			}
 			
+
+
+
+			//BB collision
+			for (int i = 0; i < 4; i++)
+			{
+				collision(*Balle, *murs_list[i]);
+			}
+
+
+
+
+
+
 			Vector v1_rotated = Plateau->getv1();
 			Vector v2_rotated = Plateau->getv2();
 			Vector a = (g * v1_rotated) * v1_rotated + (g * v2_rotated) * v2_rotated;
-			Balle->getAnim().setAccel(0.0001 * a);
+			Balle->getAnim().setAccel(a);
 			Balle->getAnim().setSpeed(Balle->getAnim().getSpeed()* v1_rotated* v1_rotated + Balle->getAnim().getSpeed() * v2_rotated * v2_rotated + Balle->getAnim().getAccel());
 
 			

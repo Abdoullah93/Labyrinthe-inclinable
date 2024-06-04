@@ -9,7 +9,8 @@ class Animation
 private:
     double phi, theta; // Azimuthal and polar angles for local coordinate system orientation
     Vector acc, spd; //  Instantaneous acceleration and speed
-    Point pos; // Instantaneous position of the local coordinate system origin
+    Point pos, posMax; // Instantaneous position of the local coordinate system origin
+    Vector Fn; // Normal force
 
 public:
     Animation(double ph = 0.0, double th = 0.0,
@@ -27,6 +28,10 @@ public:
     void setSpeed(Vector vect) {spd = vect;}
     Point getPos() const {return pos;}
     void setPos(Point pt) {pos = pt;}
+    void setFn(Vector vect) { Fn = vect; }
+    Vector getFn() const { return Fn; }
+    Point getPosMax() const { return posMax; }
+    void setPosMax(Point pt) { posMax = pt; }
 };
 
 

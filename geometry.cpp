@@ -123,6 +123,18 @@ Vector Vector::operator^(const Vector &v)
 	return res;
 }
 
+
+Vector operator/(const Vector& v, const double& k)
+{
+    Vector res = v;
+
+    res.x /= k;
+    res.y /= k;
+    res.z /= k;
+
+    return res;
+}
+
 Vector operator-(const Vector &v1, const Vector &v2)
 {
     Vector res = -v2;

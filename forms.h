@@ -5,6 +5,8 @@
 #include "animation.h"
 #include <vector>
 
+enum FormType { SPHERE, CUBE_FACE };
+
 class Color
 {
 public:
@@ -27,6 +29,7 @@ class Form
 protected:
     Color col;
     Animation anim;
+    FormType type;
 public:
     Animation& getAnim() {return anim;}
     void setAnim(Animation ani) {anim = ani;}
@@ -37,6 +40,7 @@ public:
     virtual void update(double delta_t) = 0;
     // Virtual method : Form is a generic type, only setting color and reference position
     virtual void render();
+    FormType getType() const { return type; }
 };
 
 
@@ -76,8 +80,6 @@ public:
     void setv2(Vector vect) { vdir2 = vect; }
     double getLength() const { return length; }
     double getWidth() const { return width; }
-    Point getOrg() const { return org; }
-    Point setOrg(Point pt) { org = pt; }
 
 };
 
