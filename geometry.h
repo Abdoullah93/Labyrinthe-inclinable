@@ -21,7 +21,6 @@ public:
     // Point constructor calls the base class constructor and do nothing more
     Point(double xx=0, double yy=0, double zz=0) : Coordinates(xx, yy, zz) {}
     void translate(const Vector &);
-    Point operator+(const Point &v) {return Point(x+v.x, y+v.y, z+v.z);}
 };
 
 

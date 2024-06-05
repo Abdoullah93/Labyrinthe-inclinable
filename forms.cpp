@@ -52,10 +52,6 @@ void Sphere::update(double delta_t)
     // Mise à jour de la position en intégrant la vitesse sur le temps delta_t
     Point newPos = anim.getPos();
     newPos.translate(newSpeed.integral(delta_t));
-    if (newPos.y < radius)
-	{
-		newPos.y = radius;
-	}
     anim.setPos(newPos);
 
     anim.setTheta(anim.getTheta()+1);

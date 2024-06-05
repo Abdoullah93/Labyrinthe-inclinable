@@ -54,7 +54,7 @@ const Color B_color = BLUE;
 const int P_Omega_normalise = 5;
 const double g = 9.81;
 const double B_mass = 1;
-double k = 0.2;
+double k = 3;
 
 /***************************************************************************/
 /* Functions implementations                                               */
@@ -196,7 +196,11 @@ void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
 				{
 					
 			        //Alors changer la force normale
-					Vector Fn(0,B_mass * g * k, 0);
+					if (k<0.01)
+					{
+						k = 0;
+					}
+					Vector Fn(0,B_mass * g * 0.01 + k, 0);
 					
 					k = 0.8 * k;
 					formlist[i]->getAnim().setSpeed(Vector(0, 0, 0));
