@@ -304,12 +304,12 @@ int main(int argc, char* args[])
 
 		// Creer les murs du plateau
 		Cube_face* Mur1 = NULL;
-		Mur1 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(0, Bord_width/2, -P_length / 2), P_width, Bord_width, WHITE);
+		Mur1 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(0, Bord_width/2, -P_length / 2), P_width, Bord_width, GREEN);
 		forms_list[number_of_forms] = Mur1;
 		number_of_forms++;
 
 		Cube_face* Mur2 = NULL;
-		Mur2 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(0, Bord_width / 2, P_length / 2), P_width, Bord_width, YELLOW);
+		Mur2 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(0, Bord_width / 2, P_length / 2), P_width, Bord_width, GREEN);
 		forms_list[number_of_forms] = Mur2;
 		number_of_forms++;
 
@@ -319,7 +319,7 @@ int main(int argc, char* args[])
 		number_of_forms++;
 
 		Cube_face* Mur4 = NULL;
-		Mur4 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(P_width / 2, Bord_width / 2, 0), P_length, Bord_width, ORANGE);
+		Mur4 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(P_width / 2, Bord_width / 2, 0), P_length, Bord_width, GREEN);
 		forms_list[number_of_forms] = Mur4;
 		number_of_forms++;
 
@@ -331,36 +331,43 @@ int main(int argc, char* args[])
 
 		//Création de 6 murs pour le labyrinthe
 		Cube_face* Mur5 = NULL;
-		Mur5 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(0, Bord_width / 2, -0.5), P_width, Bord_width, BLUE);
+		Mur5 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(-P_width/3, Bord_width / 2, -0.25 * P_length), P_length/2, Bord_width, WHITE);
 		forms_list[number_of_forms] = Mur5;
 		number_of_forms++;
 
 		Cube_face* Mur6 = NULL;
-		Mur6 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(0, Bord_width / 2, 0.5), P_width, Bord_width, BLUE);
+		double coef = -1 / 12;
+		Mur6 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-P_width/12, Bord_width / 2, 0), P_width*0.5, Bord_width, WHITE);
 		forms_list[number_of_forms] = Mur6;
 		number_of_forms++;
 
 		Cube_face* Mur7 = NULL;
-		Mur7 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(-0.5, Bord_width / 2, 0), P_width, Bord_width, BLUE);
+		coef = 1 / 6;
+		Mur7 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(P_width/6, Bord_width / 2, -P_length/6), P_length*0.33, Bord_width, WHITE);
 		forms_list[number_of_forms] = Mur7;
 		number_of_forms++;
 
 		Cube_face* Mur8 = NULL;
-		Mur8 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(0.5, Bord_width / 2, 0), P_width, Bord_width, BLUE);
+		Mur8 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(2*P_width/6, Bord_width / 2, -P_length/6), 4*P_length/6, Bord_width, WHITE);
 		forms_list[number_of_forms] = Mur8;
 		number_of_forms++;
 
 		Cube_face* Mur9 = NULL;
-		Mur9 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(0, Bord_width / 2, 0), P_width, Bord_width, BLUE);
+		Mur9 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(0, Bord_width / 2, P_length/6), 4*P_width/6, Bord_width, WHITE);
 		forms_list[number_of_forms] = Mur9;
 		number_of_forms++;
 
 		Cube_face* Mur10 = NULL;
-		Mur10 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(0, Bord_width / 2, 0), P_width/2, 0.1, BLUE);
+		Mur10 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(-2*P_width/6, Bord_width / 2, 3 * P_length / 12), 2*P_length/12, Bord_width, WHITE);
 		forms_list[number_of_forms] = Mur10;
 		number_of_forms++;
 
+		Cube_face* Mur11 = NULL;
+		Mur11 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(0, Bord_width / 2, 2*P_length / 6), 4 * P_width / 6, Bord_width, WHITE);
+		forms_list[number_of_forms] = Mur11;
+		number_of_forms++;
 
+		Cube_face* labyrinthe_list[7] = { Mur5, Mur6, Mur7, Mur8, Mur9, Mur10, Mur11 };
 		
 		Vector* B_Speed = new Vector(0, 0, 0);
 		Balle->getAnim().setSpeed(*B_Speed);
@@ -415,6 +422,11 @@ int main(int argc, char* args[])
 							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
 							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
 						}
+						for (int i = 0; i < 7; i++)
+						{
+							labyrinthe_list[i]->setv2(Rotation(labyrinthe_list[i]->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
+							labyrinthe_list[i]->setv1(Rotation(labyrinthe_list[i]->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
+						}
 
 						pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), -P_Omega_normalise);
 						new_pos.translate(pos_vecteur);
@@ -426,6 +438,14 @@ int main(int argc, char* args[])
 						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
 						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
 						Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+						Mur5->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.33) * Plateau->getv1() + (Mur3->getLength() * -0.25) * Plateau->getv2() + height);
+						Mur6->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1/12) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+						Mur7->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 1/6) * Plateau->getv1() + (Mur3->getLength() * -1/6) * Plateau->getv2() + height);
+						Mur8->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 2/6) * Plateau->getv1() + (Mur3->getLength() * -1/6) * Plateau->getv2() + height);
+						Mur9->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 1/6) * Plateau->getv2() + height);
+						Mur10->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -2/6) * Plateau->getv1() + (Mur3->getLength() * 3/12) * Plateau->getv2() + height);
+						Mur11->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 2/6) * Plateau->getv2() + height);
+
 
 						//for (int i = 0; i < 4; i++)
 						//{
@@ -454,6 +474,12 @@ int main(int argc, char* args[])
 							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(1, 0, 0), P_Omega_normalise));
 							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(1, 0, 0), P_Omega_normalise));
 						}
+
+						for (int i = 0; i < 7; i++)
+						{
+							labyrinthe_list[i]->setv2(Rotation(labyrinthe_list[i]->getv2(), Vector(1, 0, 0), P_Omega_normalise));
+							labyrinthe_list[i]->setv1(Rotation(labyrinthe_list[i]->getv1(), Vector(1, 0, 0), P_Omega_normalise));
+						}
 						//Calculer la nouvelle position des murs à partir des vecteurs v1 et v2
 						// Calculer la nouvelle position des murs à partir des vecteurs v1 et v2
 						/*for (int i = 0; i < 4; i++)
@@ -465,7 +491,13 @@ int main(int argc, char* args[])
 						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
 						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
 						Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
-
+						Mur5->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.33) * Plateau->getv1() + (Mur3->getLength() * -0.25) * Plateau->getv2() + height);
+						Mur6->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 12) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+						Mur7->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 1 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+						Mur8->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 2 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+						Mur9->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 1 / 6) * Plateau->getv2() + height);
+						Mur10->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -2 / 6) * Plateau->getv1() + (Mur3->getLength() * 3 / 12) * Plateau->getv2() + height);
+						Mur11->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 2 / 6) * Plateau->getv2() + height);
 						break;
 					}
 					case SDLK_RIGHT:
@@ -485,6 +517,12 @@ int main(int argc, char* args[])
 							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
 							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
 						}
+
+						for (int i = 0; i < 7; i++)
+						{
+							labyrinthe_list[i]->setv2(Rotation(labyrinthe_list[i]->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
+							labyrinthe_list[i]->setv1(Rotation(labyrinthe_list[i]->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
+						}
 						/*for (int i = 0; i < 4; i++)
 						{
 							murs_list[i]->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * (i % 2 == 1 ? -0.5 : 0.5)) * Plateau->getv1() + (Mur3->getLength() * (i < 2 ? -0.5 : 0.5) * Plateau->getv2()));
@@ -494,6 +532,13 @@ int main(int argc, char* args[])
 						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
 						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
 						Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+						Mur5->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.33) * Plateau->getv1() + (Mur3->getLength() * -0.25) * Plateau->getv2() + height);
+						Mur6->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 12) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+						Mur7->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 1 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+						Mur8->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 2 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+						Mur9->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 1 / 6) * Plateau->getv2() + height);
+						Mur10->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -2 / 6) * Plateau->getv1() + (Mur3->getLength() * 3 / 12) * Plateau->getv2() + height);
+						Mur11->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 2 / 6) * Plateau->getv2() + height);
 						break;
 					}
 					case SDLK_LEFT:
@@ -514,6 +559,12 @@ int main(int argc, char* args[])
 							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(0, 0, 1), P_Omega_normalise));
 							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(0, 0, 1), P_Omega_normalise));
 						}
+
+						for (int i = 0; i < 7; i++)
+						{
+							labyrinthe_list[i]->setv2(Rotation(labyrinthe_list[i]->getv2(), Vector(0, 0, 1), P_Omega_normalise));
+							labyrinthe_list[i]->setv1(Rotation(labyrinthe_list[i]->getv1(), Vector(0, 0, 1), P_Omega_normalise));
+						}
 						/*for (int i = 0; i < 4; i++)
 						{
 							murs_list[i]->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * (i % 2 == 1 ? -0.5 : 0.5)) * Plateau->getv1() + (Mur3->getLength() * (i < 2 ? -0.5 : 0.5) * Plateau->getv2()));
@@ -523,6 +574,13 @@ int main(int argc, char* args[])
 						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
 						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
 						Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+						Mur5->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.33) * Plateau->getv1() + (Mur3->getLength() * -0.25) * Plateau->getv2() + height);
+						Mur6->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 12) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+						Mur7->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 1 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+						Mur8->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 2 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+						Mur9->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 1 / 6) * Plateau->getv2() + height);
+						Mur10->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -2 / 6) * Plateau->getv1() + (Mur3->getLength() * 3 / 12) * Plateau->getv2() + height);
+						Mur11->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 2 / 6) * Plateau->getv2() + height);
 						break;
 					}
 					case SDLK_ESCAPE: // Quit the program when Escape key is pressed
