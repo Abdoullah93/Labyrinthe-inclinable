@@ -206,42 +206,43 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos, double camAl
 	glLoadIdentity();
 
 	// Set the camera position and parameters
-	if (eyeOnBall) {
-		gluLookAt(cam_pos.x, cam_pos.y + 10, cam_pos.z, ballPos.x, ballPos.y, ballPos.z, 0, 1, 0);
+	gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	/*if (eyeOnBall) {
+		gluLookAt(cam_pos.x, cam_pos.y + 6, cam_pos.z, ballPos.x, ballPos.y, ballPos.z, 0, 1, 0);
 	}
 	else {
 		gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-	}
-	/*
+	}*/
+	
 	// Isometric view
 	glRotated(-45, 0, 1, 0);
 	glRotated(30, 1, 0, -1);
-	*/
+	
 	//Rotation of the camer (dillusion)
 	glRotated(camAlpha, 0, 1, 0);
 
 	glScalef(scale, scale, scale); // scale the matrix
 
 	// X, Y and Z axis
-	glPushMatrix(); // Preserve the camera viewing point for further forms
+	//glPushMatrix(); // Preserve the camera viewing point for further forms
 	// Render the coordinates system
-	glBegin(GL_LINES);
-	{
-		// X rouge
-		// Y vert
-		// Z bleue
-		glColor3f(1.0f, 0.0f, 0.0f);
-		glVertex3i(0, 0, 0);
-		glVertex3i(1, 0, 0);
-		glColor3f(0.0f, 1.0f, 0.0f);
-		glVertex3i(0, 0, 0);
-		glVertex3i(0, 1, 0);
-		glColor3f(0.0f, 0.0f, 1.0f);
-		glVertex3i(0, 0, 0);
-		glVertex3i(0, 0, 1);
-	}
-	glEnd();
-	glPopMatrix(); // Restore the camera viewing point for next object
+	//glBegin(GL_LINES);
+	//{
+	//	// X rouge
+	//	// Y vert
+	//	// Z bleue
+	//	glColor3f(1.0f, 0.0f, 0.0f);
+	//	glVertex3i(0, 0, 0);
+	//	glVertex3i(1, 0, 0);
+	//	glColor3f(0.0f, 1.0f, 0.0f);
+	//	glVertex3i(0, 0, 0);
+	//	glVertex3i(0, 1, 0);
+	//	glColor3f(0.0f, 0.0f, 1.0f);
+	//	glVertex3i(0, 0, 0);
+	//	glVertex3i(0, 0, 1);
+	//}
+	//glEnd();
+	//glPopMatrix(); // Restore the camera viewing point for next object
 	// Render the list of forms
 	unsigned short i = 0;
 	while (formlist[i] != NULL)
@@ -315,6 +316,10 @@ int main(int argc, char* args[])
 		Plateau = new Cube_face(v1, v2, Point(0, 0, 0), P_width, P_length, P_color);
 		forms_list[number_of_forms] = Plateau;
 		number_of_forms++;
+
+		Hole* hole = NULL;
+		hole = new Hole(Point(-0.2, -0.25), 0.1);
+		Plateau->setHole(hole);
 
 		// Creer les murs du plateau
 		Cube_face* Mur1 = NULL;
@@ -623,7 +628,7 @@ int main(int argc, char* args[])
 
 			// Render the scene
 			Point ballPos = Balle->getAnim().getPos();
-			render(forms_list, camera_position, camAlpha, scale, eyeOnBall, ballPos);
+			render(forms_list, camera_position, camAlpha, scale, true, ballPos);// eyeonball = false
 
 			// Update window screen
 			SDL_GL_SwapWindow(gWindow);
