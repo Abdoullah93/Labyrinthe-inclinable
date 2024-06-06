@@ -9,6 +9,10 @@ class Coordinates
 public:
     double x, y, z;
     Coordinates(double xx=0, double yy=0, double zz=0) {x=xx; y=yy; z=zz;}
+    // get the coordinates
+    double getX() const {return x;}
+    double getY() const {return y;}
+    double getZ() const {return z;}
 };
 
 

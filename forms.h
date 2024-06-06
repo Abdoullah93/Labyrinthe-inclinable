@@ -70,6 +70,7 @@ private:
     Vector vdir1, vdir2;
     double length, width;
     Point org;
+    Point init_org;
     Hole* hole;
 public:
     Cube_face(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1),
@@ -84,7 +85,7 @@ public:
     double getLength() const { return length; }
     double getWidth() const { return width; }
     void setHole(Hole* h) { hole = h;  };
-
+    Point getInitOrg() const { return init_org; }
 };
 
 

@@ -30,7 +30,7 @@ void collision(Sphere& Balle, Cube_face& mur, double delta_t) {
     Vector Normale_mur = mur.getv1() ^ mur.getv2();
     Vector V0 = Balle.getAnim().getSpeed();
     //printf("%f \n", V0 * Normale_mur);
-    printf("Proj_length : %f        Balle_pos_m.norm() : %f      mur.getLength : %f     dist_balle_mur  : %f \n", Proj_length, Balle_pos_m.norm(), mur.getLength(), dist_balle_mur);
+    //printf("Proj_length : %f        Balle_pos_m.norm() : %f      mur.getLength : %f     dist_balle_mur  : %f \n", Proj_length, Balle_pos_m.norm(), mur.getLength(), dist_balle_mur);
     if (Proj_length < mur.getLength() / 2 && dist_balle_mur < Balle.getRadius() && V0 * Vector(mur.getAnim().getPos(), Point(0, 0, 0)) < 0) {
         printf("collision detected \n");
 
@@ -133,6 +133,7 @@ Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color 
     width = w;
     col = cl;
     type = CUBE_FACE;
+    init_org = org;
 }
 
 
