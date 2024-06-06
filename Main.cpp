@@ -45,7 +45,7 @@ void close(SDL_Window** window);
 
 Vector Rotation(Vector V, Vector A, double Alpha);
 
-void collision(Sphere& Balle, Cube_face& mur);
+void collision(Sphere& Balle, Cube_face& mur, double delta_t);
 
 // Creates a texture into graphic memory from an image file and assign it a
 // unique ID, inside textureID
@@ -577,24 +577,18 @@ int main(int argc, char* args[])
 
 
 
-			//BB collision
-			for (int i = 0; i < 4; i++)
-			{
-				collision(*Balle, *murs_list[i]);
-			}
-
-
-
-
-
 
 			Vector v1_rotated = Plateau->getv1();
 			Vector v2_rotated = Plateau->getv2();
 			Vector a = (g * v1_rotated) * v1_rotated + (g * v2_rotated) * v2_rotated;
 			Balle->getAnim().setAccel(a);
 			Balle->getAnim().setSpeed(Balle->getAnim().getSpeed()* v1_rotated* v1_rotated + Balle->getAnim().getSpeed() * v2_rotated * v2_rotated + Balle->getAnim().getAccel());
-
 			
+			//BB collision
+			for (int i = 0; i < 4; i++)
+			{
+				collision(*Balle, *murs_list[i], ANIM_DELAY);
+			}
 
 				/*
 			if (event.type == SDL_QUIT)
