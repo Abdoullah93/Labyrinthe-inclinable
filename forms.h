@@ -30,6 +30,7 @@ protected:
     Color col;
     Animation anim;
     FormType type;
+    GLuint texture_id;
 public:
     Animation& getAnim() {return anim;}
     void setAnim(Animation ani) {anim = ani;}
@@ -57,6 +58,8 @@ public:
     void setRadius(double r) {radius = r;}
     void update(double delta_t);
     void render();
+    void setTexture(GLuint textureid) { texture_id = textureid; }
+
     //Vector getPosVector();
 };
 

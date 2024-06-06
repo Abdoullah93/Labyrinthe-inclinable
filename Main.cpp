@@ -5,7 +5,7 @@
 #include <SDL.h>
 #include <gl\glew.h>  // glu.h included
 #include <SDL_opengl.h>
-
+//#include <SDL_image.h>
 // Module for space geometry
 #include "geometry.h"
 // Module for generating and rendering forms
@@ -28,7 +28,6 @@ const int MAX_FORMS_NUMBER = 10;
 // Animation actualization delay (in ms) => 100 updates per second
 const Uint32 ANIM_DELAY = 10;
 
-
 // Starts up SDL, creates window, and initializes OpenGL
 bool init(SDL_Window** window, SDL_GLContext* context);
 
@@ -48,6 +47,10 @@ Vector Rotation(Vector V, Vector A, double Alpha);
 
 void collision(Sphere& Balle, Cube_face& mur);
 
+// Creates a texture into graphic memory from an image file and assign it a
+// unique ID, inside textureID
+// returns 0 if all went fine, a negative value otherwise
+int createTextureFromImage(const char* filename, GLuint* textureID);
 
 // Definition des parametres des objets et de l'environnement
 // Dans le code il faut faire reference a ces constants la, PAS DE VALEURS NUMERIQUES
@@ -255,7 +258,52 @@ void close(SDL_Window** window)
 	//Quit SDL subsystems
 	SDL_Quit();
 }
+/*
+int createTextureFromImage (const char* filename, GLuint* textureID)
+{
+    SDL_Surface *imgSurface = IMG_Load(filename);
+    if (imgSurface == NULL)
+    {
+        std::cerr << "Failed to load texture image: " << filename << std::endl;
+        return -1;
+    }
+    else
+    {
+        // Work out what format to tell glTexImage2D to use...
+        int mode;
+        if (imgSurface->format->BytesPerPixel == 3)   // RGB 24bit
+        {
+            mode = GL_RGB;
+        }
+        else if (imgSurface->format->BytesPerPixel == 4)     // RGBA 32bit
+        {
+            mode = GL_RGBA;
+        }
+        else
+        {
+            SDL_FreeSurface(imgSurface);
+            std::cerr << "Unable to detect the image color format of: " << filename << std::endl;
+            return -2;
+        }
+        // create one texture name
+        glGenTextures(1, textureID);
 
+        // tell opengl to use the generated texture name
+        glBindTexture(GL_TEXTURE_2D, *textureID);
+
+        // this reads from the sdl imgSurface and puts it into an openGL texture
+        glTexImage2D(GL_TEXTURE_2D, 0, mode, imgSurface->w, imgSurface->h, 0, mode, GL_UNSIGNED_BYTE, imgSurface->pixels);
+
+        // these affect how this texture is drawn later on...
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+
+        // clean up
+        SDL_FreeSurface(imgSurface);
+        return 0;
+    }
+}
+*/
 
 /***************************************************************************/
 /* MAIN Function                                                           */
@@ -285,6 +333,9 @@ int main(int argc, char* args[])
 
 		// Camera position
 		Point camera_position(0, 0.0, 5.0);
+
+		//GLuint textureid_1;
+		//createTextureFromImage("Ressources/Images./tiles.bmp", &textureid_1);
 
 		// The forms to render
 		Form* forms_list[MAX_FORMS_NUMBER];
@@ -341,6 +392,7 @@ int main(int argc, char* args[])
 		Sphere* Balle = NULL;
 		Balle = new Sphere(B_radius, B_color);
 		Balle->getAnim().setPos(Point (0, B_radius, 0));
+		//Balle->setTexture(textureid_1);
 
 		
 		Vector* B_Speed = new Vector(0, 0, 0);
