@@ -390,189 +390,183 @@ int main(int argc, char* args[])
 				SDL_Keycode key_pressed = event.key.keysym.sym;
 
 
-				Point pos = Balle->getAnim().getPos();
-				Vector pos_vecteur(Point(0, 0, 0), pos);
-				Point new_pos(0, 0, 0);
-
-				switch (event.type)
+				const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+				if (currentKeyStates[SDL_SCANCODE_UP])
 				{
-					// User requests quit
-				case SDL_QUIT:
+					Point pos = Balle->getAnim().getPos();
+					Vector pos_vecteur(Point(0, 0, 0), pos);
+					Point new_pos(0, 0, 0);
+					//Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
+					Plateau->setv2(Rotation(Plateau->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
+					Plateau->setv1(Rotation(Plateau->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
+					//Balle->getAnim().setTheta(Balle->getAnim().getTheta() - P_Omega_normalise);
+
+					for (int i = 0; i < 4; i++)
+					{
+						murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
+						murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
+					}
+					for (int i = 0; i < 7; i++)
+					{
+						labyrinthe_list[i]->setv2(Rotation(labyrinthe_list[i]->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
+						labyrinthe_list[i]->setv1(Rotation(labyrinthe_list[i]->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
+					}
+
+					pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), -P_Omega_normalise);
+					new_pos.translate(pos_vecteur);
+					Balle->getAnim().setPos(new_pos);
+
+					// Revoir height pour qu'il soit correct
+					Vector height = Bord_width / 2 * Plateau->getv2() ^ Plateau->getv1();
+					Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
+					Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
+					Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+					Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+					Mur5->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 3) * Plateau->getv1() + (Mur3->getLength() * -0.25) * Plateau->getv2() + height);
+					Mur6->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 12) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+					Mur7->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 1 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+					Mur8->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 2 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+					Mur9->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 1 / 6) * Plateau->getv2() + height);
+					Mur10->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -2 / 6) * Plateau->getv1() + (Mur3->getLength() * 3 / 12) * Plateau->getv2() + height);
+					Mur11->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 2 / 6) * Plateau->getv2() + height);
+
+				}
+				if (currentKeyStates[SDL_SCANCODE_DOWN])
+				{
+					Point pos = Balle->getAnim().getPos();
+					Vector pos_vecteur(Point(0, 0, 0), pos);
+					Point new_pos(0, 0, 0);
+					//Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
+					Plateau->setv2(Rotation(Plateau->getv2(), Vector(1, 0, 0), P_Omega_normalise));
+					Plateau->setv1(Rotation(Plateau->getv1(), Vector(1, 0, 0), P_Omega_normalise));
+
+					//Balle->getAnim().setTheta(Balle->getAnim().getTheta() + P_Omega_normalise);
+
+					pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), P_Omega_normalise);
+
+					new_pos.translate(pos_vecteur);
+					Balle->getAnim().setPos(new_pos);
+
+					for (int i = 0; i < 4; i++)
+					{
+						murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(1, 0, 0), P_Omega_normalise));
+						murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(1, 0, 0), P_Omega_normalise));
+					}
+
+					for (int i = 0; i < 7; i++)
+					{
+						labyrinthe_list[i]->setv2(Rotation(labyrinthe_list[i]->getv2(), Vector(1, 0, 0), P_Omega_normalise));
+						labyrinthe_list[i]->setv1(Rotation(labyrinthe_list[i]->getv1(), Vector(1, 0, 0), P_Omega_normalise));
+					}
+					Vector height = Bord_width / 2 * Plateau->getv2() ^ Plateau->getv1();
+					Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
+					Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
+					Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+					Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+					Mur5->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 3) * Plateau->getv1() + (Mur3->getLength() * -0.25) * Plateau->getv2() + height);
+					Mur6->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 12) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+					Mur7->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 1 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+					Mur8->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 2 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+					Mur9->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 1 / 6) * Plateau->getv2() + height);
+					Mur10->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -2 / 6) * Plateau->getv1() + (Mur3->getLength() * 3 / 12) * Plateau->getv2() + height);
+					Mur11->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 2 / 6) * Plateau->getv2() + height);
+				}
+				if (currentKeyStates[SDL_SCANCODE_LEFT])
+				{
+					Point pos = Balle->getAnim().getPos();
+					Vector pos_vecteur(Point(0, 0, 0), pos);
+					Point new_pos(0, 0, 0);
+					//Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
+					Plateau->setv1(Rotation(Plateau->getv1(), Vector(0, 0, 1), P_Omega_normalise));
+					Plateau->setv2(Rotation(Plateau->getv2(), Vector(0, 0, 1), P_Omega_normalise));
+					//Balle->getAnim().setPhi(Balle->getAnim().getPhi() + P_Omega_normalise);
+
+					pos_vecteur = Rotation(pos_vecteur, Vector(0, 0, 1), P_Omega_normalise);
+
+					new_pos.translate(pos_vecteur);
+					Balle->getAnim().setPos(new_pos);
+
+
+					for (int i = 0; i < 4; i++)
+					{
+						murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(0, 0, 1), P_Omega_normalise));
+						murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(0, 0, 1), P_Omega_normalise));
+					}
+
+					for (int i = 0; i < 7; i++)
+					{
+						labyrinthe_list[i]->setv2(Rotation(labyrinthe_list[i]->getv2(), Vector(0, 0, 1), P_Omega_normalise));
+						labyrinthe_list[i]->setv1(Rotation(labyrinthe_list[i]->getv1(), Vector(0, 0, 1), P_Omega_normalise));
+					}
+
+					Vector height = Bord_width / 2 * Plateau->getv2() ^ Plateau->getv1();
+					Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
+					Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
+					Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+					Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+					Mur5->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 3) * Plateau->getv1() + (Mur3->getLength() * -0.25) * Plateau->getv2() + height);
+					Mur6->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 12) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+					Mur7->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 1 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+					Mur8->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 2 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+					Mur9->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 1 / 6) * Plateau->getv2() + height);
+					Mur10->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -2 / 6) * Plateau->getv1() + (Mur3->getLength() * 3 / 12) * Plateau->getv2() + height);
+					Mur11->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 2 / 6) * Plateau->getv2() + height);
+				}
+				if (currentKeyStates[SDL_SCANCODE_RIGHT])
+				{
+					Point pos = Balle->getAnim().getPos();
+					Vector pos_vecteur(Point(0, 0, 0), pos);
+					Point new_pos(0, 0, 0);
+					//Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
+					Plateau->setv1(Rotation(Plateau->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
+					Plateau->setv2(Rotation(Plateau->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
+					//Balle->getAnim().setPhi(Balle->getAnim().getPhi() - P_Omega_normalise);
+
+					pos_vecteur = Rotation(pos_vecteur, Vector(0, 0, 1), -P_Omega_normalise);
+
+					new_pos.translate(pos_vecteur);
+					Balle->getAnim().setPos(new_pos);
+
+					for (int i = 0; i < 4; i++)
+					{
+						murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
+						murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
+					}
+
+					for (int i = 0; i < 7; i++)
+					{
+						labyrinthe_list[i]->setv2(Rotation(labyrinthe_list[i]->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
+						labyrinthe_list[i]->setv1(Rotation(labyrinthe_list[i]->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
+					}
+
+					Vector height = Bord_width / 2 * Plateau->getv2() ^ Plateau->getv1();
+					Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
+					Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
+					Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+					Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+					Mur5->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 3) * Plateau->getv1() + (Mur3->getLength() * -0.25) * Plateau->getv2() + height);
+					Mur6->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 12) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+					Mur7->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 1 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+					Mur8->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 2 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
+					Mur9->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 1 / 6) * Plateau->getv2() + height);
+					Mur10->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -2 / 6) * Plateau->getv1() + (Mur3->getLength() * 3 / 12) * Plateau->getv2() + height);
+					Mur11->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 2 / 6) * Plateau->getv2() + height);
+				}
+				if (currentKeyStates[SDL_SCANCODE_F])
+				{
+				}
+				if (currentKeyStates[SDL_SCANCODE_S])
+				{
+				}
+				if (currentKeyStates[SDL_SCANCODE_E])
+				{
+				}
+				if (currentKeyStates[SDL_SCANCODE_D])
+				{
+				}
+				if (currentKeyStates[SDL_SCANCODE_ESCAPE])
+				{
 					quit = true;
-					break;
-				case SDL_KEYDOWN:
-					// Handle key pressed with current mouse position
-					SDL_GetMouseState(&x, &y);
-
-					// Commande d'inclinaison du plateau
-					// IL FAUT FAIRE DE SORTE POUR AVOIR PLUSIEUR TOUCHES QUI FONCTIONNENT
-					// EN MEME TEMPS
-					switch (key_pressed)
-					{						
-					case SDLK_UP:
-					{
-						//Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
-						Plateau->setv2(Rotation(Plateau->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
-						Plateau->setv1(Rotation(Plateau->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
-						//Balle->getAnim().setTheta(Balle->getAnim().getTheta() - P_Omega_normalise);
-
-						for (int i = 0; i < 4; i++)
-						{
-							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
-							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
-						}
-						for (int i = 0; i < 7; i++)
-						{
-							labyrinthe_list[i]->setv2(Rotation(labyrinthe_list[i]->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
-							labyrinthe_list[i]->setv1(Rotation(labyrinthe_list[i]->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
-						}
-
-						pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), -P_Omega_normalise);
-						new_pos.translate(pos_vecteur);
-						Balle->getAnim().setPos(new_pos);
-
-						// Revoir height pour qu'il soit correct
-						Vector height = Bord_width / 2 * Plateau->getv2() ^ Plateau->getv1();
-						Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
-						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
-						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
-						Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
-						Mur5->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1/3) * Plateau->getv1() + (Mur3->getLength() * -0.25) * Plateau->getv2() + height);
-						Mur6->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1/12) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
-						Mur7->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 1/6) * Plateau->getv1() + (Mur3->getLength() * -1/6) * Plateau->getv2() + height);
-						Mur8->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 2/6) * Plateau->getv1() + (Mur3->getLength() * -1/6) * Plateau->getv2() + height);
-						Mur9->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 1/6) * Plateau->getv2() + height);
-						Mur10->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -2/6) * Plateau->getv1() + (Mur3->getLength() * 3/12) * Plateau->getv2() + height);
-						Mur11->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 2/6) * Plateau->getv2() + height);
-
-
-						break;
-					}
-					case SDLK_DOWN:
-					{
-						//Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
-						Plateau->setv2(Rotation(Plateau->getv2(), Vector(1, 0, 0), P_Omega_normalise));
-						Plateau->setv1(Rotation(Plateau->getv1(), Vector(1, 0, 0), P_Omega_normalise));
-
-						//Balle->getAnim().setTheta(Balle->getAnim().getTheta() + P_Omega_normalise);
-
-						pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), P_Omega_normalise);
-
-						new_pos.translate(pos_vecteur);
-						Balle->getAnim().setPos(new_pos);
-
-						for (int i = 0; i < 4; i++)
-						{
-							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(1, 0, 0), P_Omega_normalise));
-							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(1, 0, 0), P_Omega_normalise));
-						}
-
-						for (int i = 0; i < 7; i++)
-						{
-							labyrinthe_list[i]->setv2(Rotation(labyrinthe_list[i]->getv2(), Vector(1, 0, 0), P_Omega_normalise));
-							labyrinthe_list[i]->setv1(Rotation(labyrinthe_list[i]->getv1(), Vector(1, 0, 0), P_Omega_normalise));
-						}
-						Vector height = Bord_width / 2 * Plateau->getv2() ^ Plateau->getv1();
-						Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
-						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
-						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
-						Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
-						Mur5->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1/3) * Plateau->getv1() + (Mur3->getLength() * -0.25) * Plateau->getv2() + height);
-						Mur6->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 12) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
-						Mur7->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 1 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
-						Mur8->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 2 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
-						Mur9->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 1 / 6) * Plateau->getv2() + height);
-						Mur10->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -2 / 6) * Plateau->getv1() + (Mur3->getLength() * 3 / 12) * Plateau->getv2() + height);
-						Mur11->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 2 / 6) * Plateau->getv2() + height);
-						break;
-					}
-					case SDLK_RIGHT:
-					{
-						//Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
-						Plateau->setv1(Rotation(Plateau->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
-						Plateau->setv2(Rotation(Plateau->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
-						//Balle->getAnim().setPhi(Balle->getAnim().getPhi() - P_Omega_normalise);
-
-						pos_vecteur = Rotation(pos_vecteur, Vector(0, 0, 1), -P_Omega_normalise);
-
-						new_pos.translate(pos_vecteur);
-						Balle->getAnim().setPos(new_pos);
-
-						for (int i = 0; i < 4; i++)
-						{
-							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
-							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
-						}
-
-						for (int i = 0; i < 7; i++)
-						{
-							labyrinthe_list[i]->setv2(Rotation(labyrinthe_list[i]->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
-							labyrinthe_list[i]->setv1(Rotation(labyrinthe_list[i]->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
-						}
-
-						Vector height = Bord_width / 2 * Plateau->getv2() ^ Plateau->getv1();
-						Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
-						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
-						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
-						Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
-						Mur5->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1/3) * Plateau->getv1() + (Mur3->getLength() * -0.25) * Plateau->getv2() + height);
-						Mur6->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 12) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
-						Mur7->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 1 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
-						Mur8->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 2 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
-						Mur9->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 1 / 6) * Plateau->getv2() + height);
-						Mur10->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -2 / 6) * Plateau->getv1() + (Mur3->getLength() * 3 / 12) * Plateau->getv2() + height);
-						Mur11->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 2 / 6) * Plateau->getv2() + height);
-						break;
-					}
-					case SDLK_LEFT:
-					{
-						//Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
-						Plateau->setv1(Rotation(Plateau->getv1(), Vector(0, 0, 1), P_Omega_normalise));
-						Plateau->setv2(Rotation(Plateau->getv2(), Vector(0, 0, 1), P_Omega_normalise));
-						//Balle->getAnim().setPhi(Balle->getAnim().getPhi() + P_Omega_normalise);
-
-						pos_vecteur = Rotation(pos_vecteur, Vector(0, 0, 1), P_Omega_normalise);
-
-						new_pos.translate(pos_vecteur);
-						Balle->getAnim().setPos(new_pos);
-
-
-						for (int i = 0; i < 4; i++)
-						{
-							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(0, 0, 1), P_Omega_normalise));
-							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(0, 0, 1), P_Omega_normalise));
-						}
-
-						for (int i = 0; i < 7; i++)
-						{
-							labyrinthe_list[i]->setv2(Rotation(labyrinthe_list[i]->getv2(), Vector(0, 0, 1), P_Omega_normalise));
-							labyrinthe_list[i]->setv1(Rotation(labyrinthe_list[i]->getv1(), Vector(0, 0, 1), P_Omega_normalise));
-						}
-
-						Vector height = Bord_width / 2 * Plateau->getv2() ^ Plateau->getv1();
-						Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
-						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
-						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
-						Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
-						Mur5->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1/3) * Plateau->getv1() + (Mur3->getLength() * -0.25) * Plateau->getv2() + height);
-						Mur6->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -1 / 12) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
-						Mur7->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 1 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
-						Mur8->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 2 / 6) * Plateau->getv1() + (Mur3->getLength() * -1 / 6) * Plateau->getv2() + height);
-						Mur9->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 1 / 6) * Plateau->getv2() + height);
-						Mur10->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -2 / 6) * Plateau->getv1() + (Mur3->getLength() * 3 / 12) * Plateau->getv2() + height);
-						Mur11->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 2 / 6) * Plateau->getv2() + height);
-						break;
-					}
-					case SDLK_ESCAPE: // Quit the program when Escape key is pressed
-						quit = true;
-						break;
-
-					default:
-						break;
-					}
-					break;
-				default:
-					break;
 				}
 			}
 			for (int i = 0; i < 4; i++)
