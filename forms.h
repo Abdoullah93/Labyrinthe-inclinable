@@ -6,6 +6,7 @@
 #include <vector>
 
 enum FormType { SPHERE, CUBE_FACE };
+class Hole; // Forward declaration of Hole class
 
 class Color
 {
@@ -21,6 +22,7 @@ const Color GREEN(0.0f, 1.0f, 0.0f);
 const Color YELLOW(1.0f, 1.0f, 0.0f);
 const Color WHITE(1.0f, 1.0f, 1.0f);
 const Color ORANGE(1.0f, 0.65f, 0.0f);
+const Color BLACK(0.0f, 0.0f, 0.0f);
 
 
 // Generic class to render and animate an object
@@ -68,6 +70,7 @@ private:
     Vector vdir1, vdir2;
     double length, width;
     Point org;
+    Hole* hole;
 public:
     Cube_face(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1),
           Point org = Point(), double l = 1.0, double w = 1.0,
@@ -80,6 +83,7 @@ public:
     void setv2(Vector vect) { vdir2 = vect; }
     double getLength() const { return length; }
     double getWidth() const { return width; }
+    void setHole(Hole* h) { hole = h;  };
 
 };
 
@@ -92,6 +96,21 @@ private:
 public:
     Plateau(double size = 1.0, Color cl = Color());
     void update(double delta_t);
+    void render();
+};
+
+class Hole : public Form
+{
+private:
+    Point position;
+    double radius;
+public:
+
+    Hole(Point pos = Point(), double r = 1);
+    Point getPosition() const { return position; }
+    void setPosition(Point pos) { position = pos; }
+    double getRadius() const { return radius; }
+    void update(double delta_t) override {}
     void render();
 };
 

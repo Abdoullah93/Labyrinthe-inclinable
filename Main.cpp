@@ -197,20 +197,30 @@ void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
 	}
 }
 
-void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
+void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos, double camAlpha, double scale, bool eyeOnBall, Point ballPos)
 {
 	// Clear color buffer and Z-Buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	// Initialize Modelview Matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
 	// Set the camera position and parameters
-	gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	if (eyeOnBall) {
+		gluLookAt(cam_pos.x, cam_pos.y + 2, cam_pos.z, ballPos.x, ballPos.y, ballPos.z, 0, 1, 0);
+	}
+	else {
+		gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	}
+	/*
 	// Isometric view
 	glRotated(-45, 0, 1, 0);
 	glRotated(30, 1, 0, -1);
+	*/
+	//Rotation of the camer (dillusion)
+	glRotated(camAlpha, 0, 1, 0);
+
+	glScalef(scale, scale, scale); // scale the matrix
 
 	// X, Y and Z axis
 	glPushMatrix(); // Preserve the camera viewing point for further forms
@@ -232,7 +242,6 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
 	}
 	glEnd();
 	glPopMatrix(); // Restore the camera viewing point for next object
-
 	// Render the list of forms
 	unsigned short i = 0;
 	while (formlist[i] != NULL)
@@ -266,6 +275,11 @@ int main(int argc, char* args[])
 	// OpenGL context
 	SDL_GLContext gContext;
 
+	double camAlpha = 0;
+	// 
+	double scale = 1;
+	//
+	bool eyeOnBall = true;
 
 	// Start up SDL and create window
 	if (!init(&gWindow, &gContext))
@@ -554,20 +568,31 @@ int main(int argc, char* args[])
 				}
 				if (currentKeyStates[SDL_SCANCODE_F])
 				{
+					camAlpha -= 5;
 				}
 				if (currentKeyStates[SDL_SCANCODE_S])
 				{
+					camAlpha += 5;
 				}
 				if (currentKeyStates[SDL_SCANCODE_E])
 				{
+					scale += 0.25;
 				}
 				if (currentKeyStates[SDL_SCANCODE_D])
 				{
+					scale -= 0.25;
 				}
 				if (currentKeyStates[SDL_SCANCODE_ESCAPE])
 				{
 					quit = true;
 				}
+			}
+			SDL_Keycode key_pressed = event.key.keysym.sym;
+			switch (key_pressed) {
+			case SDLK_b:
+				eyeOnBall = !eyeOnBall;
+				SDL_Delay(100);
+				break;
 			}
 			for (int i = 0; i < 4; i++)
 			{
@@ -597,7 +622,8 @@ int main(int argc, char* args[])
 
 
 			// Render the scene
-			render(forms_list, camera_position);
+			Point ballPos = Balle->getAnim().getPos();
+			render(forms_list, camera_position, camAlpha, scale, eyeOnBall, ballPos);
 
 			// Update window screen
 			SDL_GL_SwapWindow(gWindow);
