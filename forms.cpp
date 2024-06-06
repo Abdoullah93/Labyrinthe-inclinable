@@ -18,6 +18,32 @@ Vector Rotation(Vector V, Vector A, double Alpha) {
 }
 
 
+void collision(Sphere& Balle, Cube_face& mur) {
+    //Par convention le vecteur v2 du mur est celui qui est orthogonal au plan
+
+    Vector Mur_length_v = mur.getLength() * mur.getv1();
+    //Point org = mur.getOrg();
+    //printf("Point coordinates: x: %.2f, y: %.2f, z: %.2f\n", org.x, org.y, org.z);
+    Vector Balle_pos_m(mur.getAnim().getPos(), Balle.getAnim().getPos());
+    double Proj_length = abs(Balle_pos_m * mur.getv1());
+    double dist_balle_mur = sqrt(pow(Balle_pos_m.norm(), 2) - pow(Proj_length, 2));
+    Vector Normale_mur = mur.getv1() ^ mur.getv2();
+    Vector V0 = Balle.getAnim().getSpeed();
+    //printf("%f \n", V0 * Normale_mur);
+    printf("Proj_length : %f        Balle_pos_m.norm() : %f      mur.getLength : %f     dist_balle_mur  : %f \n", Proj_length, Balle_pos_m.norm(), mur.getLength(), dist_balle_mur);
+    if (Proj_length < mur.getLength() / 2 && dist_balle_mur < Balle.getRadius() && V0 * Vector(mur.getAnim().getPos(), Point(0, 0, 0)) < 0) {
+        printf("collision detected \n");
+
+        Vector newSpeed = 0.5 * ((V0 * mur.getv2()) * mur.getv2() + (V0 * mur.getv1()) * mur.getv1() - (V0 * Normale_mur) * Normale_mur);
+        Point Balle_new_pos = Balle.getAnim().getPos();
+        Balle_new_pos.translate(newSpeed);
+
+        Balle.getAnim().setSpeed(newSpeed);
+        Balle.getAnim().setAccel(Vector(0, 0, 0));
+    }
+
+}
+
 
 void Form::update(double delta_t)
 {
@@ -45,7 +71,7 @@ Sphere::Sphere(double r, Color cl, Point org)
 {
     radius = r;
     col = cl;
-    //anim.setPos(org);
+    type = SPHERE;
 }
 
 
@@ -61,7 +87,7 @@ void Sphere::update(double delta_t)
     //Vector a = (g * v1_rotated) * v1_rotated + (g * v2_rotated) * v2_rotated;
     //anim.setAccel(0.001*a);
     //anim.setSpeed(anim.getSpeed() * v1_rotated * v1_rotated + anim.getSpeed() * v2_rotated * v2_rotated + anim.getAccel());
-    org.translate(anim.getSpeed());
+    org.translate(0.01 * anim.getSpeed().integral(delta_t));
     anim.setPos(org);
     //anim.setSpeed(anim.getSpeed() + anim.getAccel());
 
@@ -127,6 +153,7 @@ Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color 
     length = l;
     width = w;
     col = cl;
+    type = CUBE_FACE;
 }
 
 

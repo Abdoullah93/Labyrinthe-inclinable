@@ -59,4 +59,5 @@ double operator*(const Vector &v1, const Vector &v2);
 // Vector product
 Vector operator^(const Vector &v1, const Vector &v2);
 
+Vector operator/(const Vector& v, const double& k);
 #endif // GEOMETRY_H_INCLUDED
