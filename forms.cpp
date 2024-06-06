@@ -18,6 +18,49 @@ Vector Rotation(Vector V, Vector A, double Alpha) {
 }
 
 
+bool collisionHole(Sphere* ball, Cube_face* plateau) {
+	// Get the position of the hole
+    Hole* hole = plateau->getHole();
+	double hole_x = hole->getPosition().x;
+	double hole_y = hole->getPosition().y;
+    double hole_z = hole->getPosition().z;
+    //cout<< "hole_x: " << hole_x << " hole_y: " << hole_y << endl;
+	// Get the position of the sphere
+    double ball_x = ball->getAnim().getPos().x;
+    double ball_y = ball->getAnim().getPos().y;
+    double ball_z = ball->getAnim().getPos().z;
+    //cout<< "ball_x: " << ball_x << " ball_y: " << ball_y << endl;
+	// Calculate the distance between the hole and the sphere
+	double distance = sqrt(pow(hole_x - ball_x, 2) + pow(hole_y - ball_y, 2)+ pow(hole_z-ball_z,2));
+    //cout<< "distance: " << distance << endl;
+	// Check if the sphere is inside the hole
+
+   cout << "hole radius: " << hole->getRadius() << endl;  //0.25
+   cout << "ball radius: " << ball->getRadius() << endl;    //0.1
+   cout << "distance: " << distance << endl;               
+   cout << "hole->getRadius() + ball->getRadius(): " << hole->getRadius() + ball->getRadius() << endl;
+     if (distance < hole->getRadius() + ball->getRadius()) {
+        // Check if the sphere is close to the hole
+        // Calculate the angle between the hole and the sphere
+    
+         cout << "collision" << endl;
+         double angle = atan2(ball_y - hole_y, ball_x - hole_x);
+       
+        // Calculate the position of the sphere if it is inside the hole
+        double new_x = hole_x + (hole->getRadius() - ball->getRadius()) * cos(angle);
+        double new_y = hole_y + (hole->getRadius() - ball->getRadius()) * sin(angle);
+
+        // Update the position of the sphere
+        ball->getAnim().setSpeed(Vector(0, 0, 0));
+        ball->getAnim().setPos(Point(new_x, new_y, ball->getAnim().getPos().z));
+        ball->getAnim().setAccel(Vector(0, -9.81, 0));
+        
+        return true;
+    }
+	return false;
+}
+
+
 void Form::update(double delta_t)
 {
     // Nothing to do here, animation update is done in child class method

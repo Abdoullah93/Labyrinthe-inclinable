@@ -6,6 +6,8 @@
 
 class Hole; // Forward declaration of Hole class
 
+//bool collisionHole(Hole* hole, Sphere* ball, Cube_face& plateau);
+
 class Color
 {
 public:
@@ -52,6 +54,7 @@ public:
     Sphere(double r = 1.0, Color cl = Color());
     double getRadius() const {return radius;}
     void setRadius(double r) {radius = r;}
+
     void update(double delta_t);
     void render();
 };
@@ -78,6 +81,7 @@ public:
     Point getOrg() const { return org; }
     Point setOrg(Point pt) { org = pt; }
     void setHole(Hole* h);
+    Hole* getHole() { return hole; }
     void update(double delta_t);
     void render();
 };
