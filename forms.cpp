@@ -18,7 +18,7 @@ Vector Rotation(Vector V, Vector A, double Alpha) {
 }
 
 
-void collision(Sphere& Balle, Cube_face& mur) {
+void collision(Sphere& Balle, Cube_face& mur, double delta_t) {
     //Par convention le vecteur v2 du mur est celui qui est orthogonal au plan
 
     Vector Mur_length_v = mur.getLength() * mur.getv1();
@@ -35,11 +35,21 @@ void collision(Sphere& Balle, Cube_face& mur) {
         printf("collision detected \n");
 
         Vector newSpeed = 0.5 * ((V0 * mur.getv2()) * mur.getv2() + (V0 * mur.getv1()) * mur.getv1() - (V0 * Normale_mur) * Normale_mur);
-        Point Balle_new_pos = Balle.getAnim().getPos();
-        Balle_new_pos.translate(newSpeed);
+        Point new_Balle_pos = Balle.getAnim().getPos();
+        new_Balle_pos.translate(0.01 * newSpeed.integral(delta_t));
+        Vector new_balle_vect(mur.getAnim().getPos(), new_Balle_pos);
+
+        double Proj_length = abs(new_balle_vect * mur.getv1());
+        double dist_balle_mur = sqrt(pow(new_balle_vect.norm(), 2) - pow(Proj_length, 2));
+        if (Proj_length < mur.getLength() / 2 && dist_balle_mur < Balle.getRadius()) {
+            new_balle_vect = (Balle.getRadius() / dist_balle_mur) * new_balle_vect;
+            Point newPos = Balle.getAnim().getPos();
+            newPos.translate(new_balle_vect);
+            Balle.getAnim().setPos(newPos);
+        }
 
         Balle.getAnim().setSpeed(newSpeed);
-        Balle.getAnim().setAccel(Vector(0, 0, 0));
+        Balle.getAnim().setAccel(Balle.getAnim().getAccel() - (Balle.getAnim().getAccel() * Normale_mur) * Normale_mur);
     }
 
 }

@@ -46,7 +46,7 @@ void close(SDL_Window** window);
 
 Vector Rotation(Vector V, Vector A, double Alpha);
 
-void collision(Sphere& Balle, Cube_face& mur);
+void collision(Sphere& Balle, Cube_face& mur, double delta_t);
 // Definition des parametres des objets et de l'environnement
 // Dans le code il faut faire reference a ces constants la, PAS DE VALEURS NUMERIQUES
 // (pour le calcul de l'origine par exemple)
@@ -207,7 +207,7 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos, double camAl
 
 	// Set the camera position and parameters
 	if (eyeOnBall) {
-		gluLookAt(cam_pos.x, cam_pos.y + 2, cam_pos.z, ballPos.x, ballPos.y, ballPos.z, 0, 1, 0);
+		gluLookAt(cam_pos.x, cam_pos.y + 10, cam_pos.z, ballPos.x, ballPos.y, ballPos.z, 0, 1, 0);
 	}
 	else {
 		gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
@@ -596,11 +596,11 @@ int main(int argc, char* args[])
 			}
 			for (int i = 0; i < 4; i++)
 			{
-				collision(*Balle, *murs_list[i]);
+				collision(*Balle, *murs_list[i], ANIM_DELAY);
 			}
 			for (int i = 0; i < 7; i++)
 			{
-				collision(*Balle, *labyrinthe_list[i]);
+				collision(*Balle, *labyrinthe_list[i], ANIM_DELAY);
 			}
 			Vector v1_rotated = Plateau->getv1();
 			Vector v2_rotated = Plateau->getv2();
