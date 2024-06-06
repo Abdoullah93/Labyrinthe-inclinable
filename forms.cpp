@@ -9,6 +9,15 @@
 using namespace std;
 
 
+//BB Rotation de vecteur V autour l'axe A (qui est un vecteur) d'angle Alpha
+//le vecteur A doit etre normalisé
+Vector Rotation(Vector V, Vector A, double Alpha) {
+    Alpha = Alpha * M_PI / 180;
+    Vector V_rot = cos(Alpha) * V + sin(Alpha) * (A ^ V) + (1 - cos(Alpha)) * (A * V) * A;
+    return V_rot;
+}
+
+
 void Form::update(double delta_t)
 {
     // Nothing to do here, animation update is done in child class method
@@ -42,9 +51,12 @@ Sphere::Sphere(double r, Color cl)
 
 void Sphere::update(double delta_t)
 {
+    const Vector g(0, -9.8, 0);
+    const Vector v1(1, 0, 0);
+    const Vector v2(0, 0, 1);
+    Point org = anim.getPos();
     anim.setSpeed(anim.getSpeed() + anim.getAccel());
     // Mise � jour de la position en fonction de la vitesse
-    Point org = anim.getPos();
     org.translate(anim.getSpeed());
     anim.setPos(org);
 }
@@ -60,7 +72,7 @@ void Sphere::render()
 
     gluDeleteQuadric(quad);
 }
-
+/*
 Plateau :: Plateau(double l, double w, Point org, Point holePos, double holeWidth, Color cl)
 {
 	length = l;
@@ -92,6 +104,7 @@ Plateau :: Plateau(double l, double w, Point org, Point holePos, double holeWidt
   
 }
 
+
 void Plateau:: update(double delta_t)
 {
 	for (int i = 0; i < 5; i++)
@@ -99,6 +112,7 @@ void Plateau:: update(double delta_t)
 	    bords[i]->update(delta_t);
 	}
 }
+
 
 void Plateau::render()
 {
@@ -108,6 +122,7 @@ void Plateau::render()
 	}
 }
 
+*/
 Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color cl)
 {
     vdir1 = 1.0 / v1.norm() * v1;
@@ -125,20 +140,38 @@ void Cube_face::setHole(Hole* h)
 
 void Cube_face::update(double delta_t)
 {
+    Vector v1 = getv1();
+    Vector v2 = getv2();
 
 }
 
 
-void Cube_face::render()
-{
+void Cube_face::render() {
+    // Save the current transformation state
+    glPushMatrix();
+
+    // Initialize points at the center
     Point p1 = Point();
-    Point p2 = p1, p3, p4 = p1;
-    p2.translate(length * vdir1);
-    p3 = p2;
-    p3.translate(width * vdir2);
-    p4.translate(width * vdir2);
+    Point p2 = Point();
+    Point p3 = Point();
+    Point p4 = Point();
+
+    // Translate points from the center
+    p1.translate(-length / 2 * vdir1);
+    p1.translate(-width / 2 * vdir2);
+
+    p2.translate(length / 2 * vdir1);
+    p2.translate(-width / 2 * vdir2);
+
+    p3.translate(length / 2 * vdir1);
+    p3.translate(width / 2 * vdir2);
+
+    p4.translate(-length / 2 * vdir1);
+    p4.translate(width / 2 * vdir2);
 
     Form::render();
+
+    glColor3f(col.r, col.g, col.b);
 
     glBegin(GL_QUADS);
     {
@@ -150,18 +183,47 @@ void Cube_face::render()
     glEnd();
 
     // Render the hole if it exists
-
     if (hole != nullptr) {
-        glPushMatrix();
-        // Translate to the hole's position relative to the cube face
-        glTranslatef(hole->getPosition().x, hole->getPosition().y+0.001, hole->getPosition().z);
-        hole->render();
-        glPopMatrix();
+        
+                double x = hole->getPosition().x;
+                double y = hole->getPosition().y;
+                Vector holeOriginInNewBase = x*vdir1 + y*vdir2 + 0.001 * (vdir2^vdir1);
+                Point holeOrigin(holeOriginInNewBase.x, holeOriginInNewBase.y, holeOriginInNewBase.z);
+
+                // Translate to the hole's position relative to the cube face
+                glTranslatef(holeOrigin.x, holeOrigin.y, holeOrigin.z);
+
+                // Rotate the disk to be parallel with the cube face
+                // Adjust the axis and angle based on your cube face orientation
+               // glRotatef(90, 0.0f, 0.0f, 1.0f);
+
+                // Set the color for the hole (black)
+                glColor3f(0.0f, 0.0f, 0.0f);
+
+                // Draw the filled disk
+                glBegin(GL_TRIANGLE_FAN);
+                {
+                    //glVertex3f(0.0f, 0.0f, 0.0f); // Center of the disk
+                    for (int i = 0; i <= 360; i++) {
+                        float angle = i * M_PI / 180.0f;
+                        float x = hole->getRadius() * cos(angle);
+                        float y = hole->getRadius() * sin(angle);
+                        Point bord = holeOrigin;
+                        bord.translate(x * vdir1);
+                        bord.translate(y * vdir2);
+                        glVertex3f(bord.x, bord.y, bord.z);
+                    }
+                }
+                glEnd();
+
     }
+    // Restore the previous transformation state
+    glPopMatrix();
+
     
 }
-
-Hole :: Hole(Point pos, double r) 
+    
+Hole::Hole(Point pos, double r)
 {
 	position = pos;
 	radius = r;
@@ -177,3 +239,4 @@ void Hole::render()
     gluDisk(quad, 0, radius, 32, 1);
     gluDeleteQuadric(quad);
 }
+

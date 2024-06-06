@@ -11,6 +11,7 @@
 // Module for generating and rendering forms
 #include "forms.h"
 
+
 using namespace std;
 
 
@@ -43,6 +44,8 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos);
 // Frees media and shuts down SDL
 void close(SDL_Window** window);
 
+Vector Rotation(Vector V, Vector A, double Alpha);
+
 
 // Definition des parametres des objets et de l'environnement
 // Dans le code il faut faire reference a ces constants la, PAS DE VALEURS NUMERIQUES
@@ -53,7 +56,9 @@ const double B_radius = 0.1;
 const Color P_color = RED;
 const Color B_color = BLUE;
 const int P_Omega_normalise = 5;
-
+const int P_incline_limit = 30;
+const double Bord_width = 0.2;
+const Vector g(0, -9.8, 0);
 
 
 
@@ -62,196 +67,202 @@ const int P_Omega_normalise = 5;
 /***************************************************************************/
 bool init(SDL_Window** window, SDL_GLContext* context)
 {
-    // Initialization flag
-    bool success = true;
+	// Initialization flag
+	bool success = true;
 
-    // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
-        success = false;
-    }
-    else
-    {
-        // Use OpenGL 2.1
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+	// Initialize SDL
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
+		success = false;
+	}
+	else
+	{
+		// Use OpenGL 2.1
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
-        // Create window
-        *window = SDL_CreateWindow("TP intro OpenGL / SDL 2", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-        if (*window == NULL)
-        {
-            std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
-            success = false;
-        }
-        else
-        {
-            // Create context
-            *context = SDL_GL_CreateContext(*window);
-            if (*context == NULL)
-            {
-                std::cout << "OpenGL context could not be created! SDL Error: " << SDL_GetError() << std::endl;
-                success = false;
-            }
-            else
-            {
-                // Use Vsync
-                if (SDL_GL_SetSwapInterval(1) < 0)
-                {
-                    std::cout << "Warning: Unable to set VSync! SDL Error: " << SDL_GetError() << std::endl;
-                }
+		// Create window
+		*window = SDL_CreateWindow("TP intro OpenGL / SDL 2", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+		if (*window == NULL)
+		{
+			std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
+			success = false;
+		}
+		else
+		{
+			// Create context
+			*context = SDL_GL_CreateContext(*window);
+			if (*context == NULL)
+			{
+				std::cout << "OpenGL context could not be created! SDL Error: " << SDL_GetError() << std::endl;
+				success = false;
+			}
+			else
+			{
+				// Use Vsync
+				if (SDL_GL_SetSwapInterval(1) < 0)
+				{
+					std::cout << "Warning: Unable to set VSync! SDL Error: " << SDL_GetError() << std::endl;
+				}
 
-                // Initialize OpenGL
-                if (!initGL())
-                {
-                    std::cout << "Unable to initialize OpenGL!" << std::endl;
-                    success = false;
-                }
-            }
-        }
-    }
+				// Initialize OpenGL
+				if (!initGL())
+				{
+					std::cout << "Unable to initialize OpenGL!" << std::endl;
+					success = false;
+				}
+			}
+		}
+	}
 
-    return success;
+	return success;
 }
 
 
 bool initGL()
 {
-    bool success = true;
-    GLenum error = GL_NO_ERROR;
+	bool success = true;
+	GLenum error = GL_NO_ERROR;
 
-    // Initialize Projection Matrix
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+	// Initialize Projection Matrix
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 
-    // Set the viewport : use all the window to display the rendered scene
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	// Set the viewport : use all the window to display the rendered scene
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    // Fix aspect ratio and depth clipping planes
-    gluPerspective(40.0, (GLdouble)SCREEN_WIDTH / SCREEN_HEIGHT, 1.0, 100.0);
-
-
-    // Initialize Modelview Matrix
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    // Initialize clear color : black with no transparency
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-    // Activate Z-Buffer
-    glEnable(GL_DEPTH_TEST);
+	// Fix aspect ratio and depth clipping planes
+	gluPerspective(40.0, (GLdouble)SCREEN_WIDTH / SCREEN_HEIGHT, 1.0, 100.0);
 
 
-    // Lighting basic configuration and activation
-    const GLfloat light_ambient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
-    const GLfloat light_diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    const GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
+	// Initialize Modelview Matrix
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
-    const GLfloat mat_ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
-    const GLfloat mat_diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-    const GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    const GLfloat high_shininess[] = { 100.0f };
+	// Initialize clear color : black with no transparency
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    glEnable(GL_LIGHT0);
-    glEnable(GL_LIGHT1);
-    glEnable(GL_NORMALIZE);
-    glEnable(GL_COLOR_MATERIAL);
-    glEnable(GL_LIGHTING);
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+	// Activate Z-Buffer
+	glEnable(GL_DEPTH_TEST);
 
 
-    // Check for error
-    error = glGetError();
-    if (error != GL_NO_ERROR)
-    {
-        std::cout << "Error initializing OpenGL!  " << gluErrorString(error) << std::endl;
-        success = false;
-    }
+	// Lighting basic configuration and activation
+	const GLfloat light_ambient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+	const GLfloat light_diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	const GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
 
-    return success;
+	const GLfloat mat_ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+	const GLfloat mat_diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+	const GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	const GLfloat high_shininess[] = { 100.0f };
+
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
+	glEnable(GL_NORMALIZE);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_LIGHTING);
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+
+
+	// Check for error
+	error = glGetError();
+	if (error != GL_NO_ERROR)
+	{
+		std::cout << "Error initializing OpenGL!  " << gluErrorString(error) << std::endl;
+		success = false;
+	}
+
+	return success;
 }
 
 void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
 {
-    // Update the list of forms
-    unsigned short i = 0;
-    while (formlist[i] != NULL)
-    {
-        formlist[i]->update(delta_t);
-        i++;
-    }
+	// Update the list of forms
+	unsigned short i = 0;
+	while (formlist[i] != NULL)
+	{
+		formlist[i]->update(delta_t);
+		i++;
+	}
 }
 
-void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos, double camAlpha, double scale)
+void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos, double camAlpha, double scale, bool eyeOnBall, Point ballPos)
 {
-    // Clear color buffer and Z-Buffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// Clear color buffer and Z-Buffer
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Initialize Modelview Matrix
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+	// Initialize Modelview Matrix
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
-    // Set the camera position and parameters
-    gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-    // Isometric view
-    glRotated(-45, 0, 1, 0);
-    glRotated(30, 1, 0, -1);
+	// Set the camera position and parameters
+	if (eyeOnBall) {
+		gluLookAt(cam_pos.x, cam_pos.y+2, cam_pos.z, ballPos.x, ballPos.y, ballPos.z, 0, 1, 0);
+	}
+	else {
+		gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	}
+	/*	
+	// Isometric view
+	glRotated(-45, 0, 1, 0);
+	glRotated(30, 1, 0, -1);
+	*/
+	//Rotation of the camer (dillusion)
+	glRotated(camAlpha, 0, 1, 0);
 
-    //Rotation of the camer (dillusion)
-    glRotated(camAlpha, 0, 1, 0);
+	glScalef(scale, scale, scale); // scale the matrix
 
-    glScalef(scale, scale, scale); // scale the matrix
+	// X, Y and Z axis
+	glPushMatrix(); // Preserve the camera viewing point for further forms
+	// Render the coordinates system
+	glBegin(GL_LINES);
+	{
+		// X rouge
+		// Y vert
+		// Z bleue
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glVertex3i(0, 0, 0);
+		glVertex3i(1, 0, 0);
+		glColor3f(0.0f, 1.0f, 0.0f);
+		glVertex3i(0, 0, 0);
+		glVertex3i(0, 1, 0);
+		glColor3f(0.0f, 0.0f, 1.0f);
+		glVertex3i(0, 0, 0);
+		glVertex3i(0, 0, 1);
+	}
+	glEnd();
+	glPopMatrix(); // Restore the camera viewing point for next object
 
-    // X, Y and Z axis
-    glPushMatrix(); // Preserve the camera viewing point for further forms
-    // Render the coordinates system
-    glBegin(GL_LINES);
-    {
-        // X rouge
-        // Y vert
-        // Z bleue
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glVertex3i(0, 0, 0);
-        glVertex3i(1, 0, 0);
-        glColor3f(0.0f, 1.0f, 0.0f);
-        glVertex3i(0, 0, 0);
-        glVertex3i(0, 1, 0);
-        glColor3f(0.0f, 0.0f, 1.0f);
-        glVertex3i(0, 0, 0);
-        glVertex3i(0, 0, 1);
-    }
-    glEnd();
-    glPopMatrix(); // Restore the camera viewing point for next object
-
-    // Render the list of forms
-    unsigned short i = 0;
-    while (formlist[i] != NULL)
-    {
-        glPushMatrix(); // Preserve the camera viewing point for further forms
-        formlist[i]->render();
-        glPopMatrix(); // Restore the camera viewing point for next object
-        i++;
-    }
+	// Render the list of forms
+	unsigned short i = 0;
+	while (formlist[i] != NULL)
+	{
+		glPushMatrix(); // Preserve the camera viewing point for further forms
+		formlist[i]->render();
+		glPopMatrix(); // Restore the camera viewing point for next object
+		i++;
+	}
 }
 
 void close(SDL_Window** window)
 {
-    //Destroy window
-    SDL_DestroyWindow(*window);
-    *window = NULL;
+	//Destroy window
+	SDL_DestroyWindow(*window);
+	*window = NULL;
 
-    //Quit SDL subsystems
-    SDL_Quit();
+	//Quit SDL subsystems
+	SDL_Quit();
 }
 
 
@@ -260,200 +271,364 @@ void close(SDL_Window** window)
 /***************************************************************************/
 int main(int argc, char* args[])
 {
-    // The window we'll be rendering to
-    SDL_Window* gWindow = NULL;
+	// The window we'll be rendering to
+	SDL_Window* gWindow = NULL;
 
-    // OpenGL context
-    SDL_GLContext gContext;
-
-    // Camera parameters
-    double camAlpha = 0.0;
-
-    //Zoom In ann Out parameters
-    double scale = 1.0;
-
-    // Start up SDL and create window
-    if (!init(&gWindow, &gContext))
-    {
-        std::cout << "Failed to initialize!" << std::endl;
-    }
-    else
-    {
-        // Main loop flag
-        bool quit = false;
-        Uint32 current_time, previous_time, elapsed_time;
-
-        // Event handler
-        SDL_Event event;
-
-        // Camera position
-        Point camera_position(0, 0.0, 5.0);
-
-        // The forms to render
-        Form* forms_list[MAX_FORMS_NUMBER];
-        unsigned short number_of_forms = 0, i;
-        for (i = 0; i < MAX_FORMS_NUMBER; i++)
-        {
-            forms_list[i] = NULL;
-        }
-
-        
-        // Creer le plateau centré à l'origine (pour l'instant c'est une planche)
-        Cube_face* P1 = NULL;
-        P1 = new Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), Point(-P_width / 2, 0, -P_length / 2), P_width, P_length, P_color);
-        forms_list[number_of_forms] = P1;
-        number_of_forms++;
-
-        //Creer les murs du plateau
-        Cube_face* Mur1 = NULL;
-        Mur1 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-P_width / 2, 0, -P_length / 2), P_width, 0.1, WHITE);
-        forms_list[number_of_forms] = Mur1;
-        number_of_forms++;
-
-        Cube_face* Mur2 = NULL;
-        Mur2 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-P_width / 2, 0, P_length / 2), P_width, 0.1, YELLOW);
-        forms_list[number_of_forms] = Mur2;
-        number_of_forms++;
-
-        Cube_face* Mur3 = NULL;
-        Mur3 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(-P_width / 2, 0, -P_length / 2), P_length, 0.1, GREEN);
-        forms_list[number_of_forms] = Mur3;
-        number_of_forms++;
-
-        Cube_face* Mur4 = NULL;
-        Mur4 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(P_width / 2, 0, -P_length / 2), P_length, 0.1, ORANGE);
-        forms_list[number_of_forms] = Mur4;
-        number_of_forms++;
-
-        Form* murs_list[4] = { Mur1, Mur2, Mur3, Mur4 };
-
-        // 
-        Hole* Trou1 = NULL;
-        Trou1 = new Hole(Point(P_width / 2, 0, P_length / 2), 0.1);
-        P1->setHole(Trou1);
-       
- /*
-         // Creer le plateau centré à l'origine (pour l'instant c'est une planche)
-        Plateau* P1 = NULL;
-        P1 = new Plateau (3, 2, Point(0,0,0), Point(1,0,1.5), 0.1, WHITE);
-        forms_list[number_of_forms] = P1;
-        number_of_forms++;
- */
+	// OpenGL context
+	SDL_GLContext gContext;
+	
+	// 
+	double camAlpha = 0;
+	// 
+	double scale = 1;
+	//
+	bool eyeOnBall = false;
 
 
-        // Creer la balle et la placer sur le plateau (une vitesse et une acceleration sont données pour tester)
-        Sphere* Balle = NULL;
-        Balle = new Sphere(B_radius, B_color);
-        Balle->getAnim().setPos(Point(0, B_radius, 0));
+	// Start up SDL and create window
+	if (!init(&gWindow, &gContext))
+	{
+		std::cout << "Failed to initialize!" << std::endl;
+	}
+	else
+	{
+		// Main loop flag
+		bool quit = false;
+		Uint32 current_time, previous_time, elapsed_time;
 
-        Vector* B_Speed = NULL;
-        B_Speed = new Vector(-0.005, 0, 0.005);
-        Balle->getAnim().setSpeed(*B_Speed);
+		// Event handler
+		SDL_Event event;
 
-        Vector* B_Accel = new Vector(0.0001, 0, 0);
-        Balle->getAnim().setAccel(*B_Accel);
+		// Camera position
+		Point camera_position(0, 0.0, 5.0);
 
-        forms_list[number_of_forms] = Balle;
-        number_of_forms++;
+		// The forms to render
+		Form* forms_list[MAX_FORMS_NUMBER];
+		unsigned short number_of_forms = 0, i;
+		for (i = 0; i < MAX_FORMS_NUMBER; i++)
+		{
+			forms_list[i] = NULL;
+		}
 
-        // Get first "current time"
-        previous_time = SDL_GetTicks();
-        // While application is running
-        while (!quit)
-        {
-            // Handle events on queue
-            while (SDL_PollEvent(&event) != 0)
-            {
-                int x = 0, y = 0;
-                SDL_Keycode key_pressed = event.key.keysym.sym;
+		// Creer le plateau centré à l'origine (pour l'instant c'est une planche)
+		Cube_face* Plateau = NULL;
+		Vector v1(1, 0, 0);
+		Vector v2(0, 0, 1);
+		Plateau = new Cube_face(v1, v2, Point(0, 0, 0), P_width, P_length, P_color);
+		forms_list[number_of_forms] = Plateau;
+		number_of_forms++;
 
-                switch (event.type)
-                {
-                    // User requests quit
-                case SDL_QUIT:
-                    quit = true;
-                    break;
-                case SDL_KEYDOWN:
-                    // Handle key pressed with current mouse position
-                    SDL_GetMouseState(&x, &y);
+		Hole* hole = NULL;
+		hole = new Hole(Point(0.25, 0.25), 0.1);
+		Plateau->setHole(hole);
 
-                    // Commande d'inclinaison du plateau
-                    // IL FAUT FAIRE DE SORTE POUR AVOIR PLUSIEUR TOUCHES QUI FONCTIONNENT
-                    // EN MEME TEMPS
-                    switch (key_pressed)
-                    {
-                    case SDLK_UP:
-                        P1->getAnim().setTheta(P1->getAnim().getTheta() - P_Omega_normalise);
-                        for (int i = 0; i < 4; i++)
-                        {
-                            //murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() - P_Omega_normalise);
-                        }
-                        break;
-                    case SDLK_DOWN:
-                        P1->getAnim().setTheta(P1->getAnim().getTheta() + P_Omega_normalise);
-                        for (int i = 0; i < 4; i++)
-                        {
-                            //murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() + P_Omega_normalise);
-                        }
-                        break;
-                    case SDLK_RIGHT:
-                        P1->getAnim().setPhi(P1->getAnim().getPhi() - P_Omega_normalise);
-                        for (int i = 0; i < 4; i++)
-                        {
-                            //murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() - P_Omega_normalise);
-                        }
-                        break;
-                    case SDLK_LEFT:
-                        P1->getAnim().setPhi(P1->getAnim().getPhi() + P_Omega_normalise);
-                        for (int i = 0; i < 4; i++)
-                        {
-                            //murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() + P_Omega_normalise);
-                        }
-                        break;
-                    case SDLK_f:
-                        camAlpha -= 5;
-                        break;
-                    case SDLK_s:
-                        camAlpha += 5;
-                        break;
-                    case SDLK_e:
-                        scale += 0.25;
-                        break;
-                    case SDLK_d:
-                        scale -= 0.25;
-                        break;
-                    case SDLK_ESCAPE: // Quit the program when Escape key is pressed
-                        quit = true;
-                        break;
 
-                    default:
-                        break;
-                    }
-                    break;
-                default:
-                    break;
-                }
-            }
 
-            // Update the scene
-            current_time = SDL_GetTicks(); // get the elapsed time from SDL initialization (ms)
-            elapsed_time = current_time - previous_time;
-            if (elapsed_time > ANIM_DELAY)
-            {
-                previous_time = current_time;
-                update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
-            }
+		// Creer les murs du plateau
+		Cube_face* Mur1 = NULL;
+		Mur1 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(0, Bord_width / 2, -P_length / 2), P_width, Bord_width, WHITE);
+		forms_list[number_of_forms] = Mur1;
+		number_of_forms++;
 
-            // Render the scene
-            render(forms_list, camera_position,camAlpha, scale);
+		Cube_face* Mur2 = NULL;
+		Mur2 = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(0, Bord_width / 2, P_length / 2), P_width, Bord_width, YELLOW);
+		forms_list[number_of_forms] = Mur2;
+		number_of_forms++;
 
-            // Update window screen
-            SDL_GL_SwapWindow(gWindow);
-        }
-    }
+		Cube_face* Mur3 = NULL;
+		Mur3 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(-P_width / 2, Bord_width / 2, 0), P_length, Bord_width, GREEN);
+		forms_list[number_of_forms] = Mur3;
+		number_of_forms++;
 
-    // Free resources and close SDL
-    close(&gWindow);
+		Cube_face* Mur4 = NULL;
+		Mur4 = new Cube_face(Vector(0, 0, 1), Vector(0, 1, 0), Point(P_width / 2, Bord_width / 2, 0), P_length, Bord_width, ORANGE);
+		forms_list[number_of_forms] = Mur4;
+		number_of_forms++;
 
-    return 0;
+		Cube_face* murs_list[4] = { Mur1, Mur2, Mur3, Mur4 };
+		// Creer la balle et la placer sur le plateau (une vitesse et une acceleration sont données pour tester)
+		Sphere* Balle = NULL;
+		Balle = new Sphere(B_radius, B_color);
+		Balle->getAnim().setPos(Point(0.5, B_radius, 0.5));
+
+
+		Vector* B_Speed = new Vector(0, 0, 0);
+		Balle->getAnim().setSpeed(*B_Speed);
+
+		Vector* B_Accel = new Vector(0, 0, 0);
+		Balle->getAnim().setAccel(*B_Accel);
+
+		forms_list[number_of_forms] = Balle;
+		number_of_forms++;
+
+
+		// Get first "current time"
+		previous_time = SDL_GetTicks();
+		// While application is running
+		while (!quit)
+		{
+			// Handle events on queue
+			while (SDL_PollEvent(&event) != 0)
+			{
+				int x = 0, y = 0;
+				SDL_Keycode key_pressed = event.key.keysym.sym;
+
+
+				Point pos = Balle->getAnim().getPos();
+				Vector pos_vecteur(Point(0, 0, 0), pos);
+				Point new_pos(0, 0, 0);
+
+				switch (event.type)
+				{
+					// User requests quit
+				case SDL_QUIT:
+					quit = true;
+					break;
+				case SDL_KEYDOWN:
+					// Handle key pressed with current mouse position
+					SDL_GetMouseState(&x, &y);
+
+					// Commande d'inclinaison du plateau
+					// IL FAUT FAIRE DE SORTE POUR AVOIR PLUSIEUR TOUCHES QUI FONCTIONNENT
+					// EN MEME TEMPS
+					switch (key_pressed)
+					{
+					case SDLK_UP:
+					{
+						//Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
+						Plateau->setv2(Rotation(Plateau->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
+						Plateau->setv1(Rotation(Plateau->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
+						//Balle->getAnim().setTheta(Balle->getAnim().getTheta() - P_Omega_normalise);
+
+						for (int i = 0; i < 4; i++)
+						{
+							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
+							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
+						}
+
+						pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), -P_Omega_normalise);
+						new_pos.translate(pos_vecteur);
+						Balle->getAnim().setPos(new_pos);
+
+						// Revoir height pour qu'il soit correct
+						Vector height = Plateau->getv2() ^ Plateau->getv1() * Bord_width / 2;
+						height = Vector(0, 0, 0);
+						Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
+						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
+						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+						Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+
+						break;
+					}
+					case SDLK_DOWN:
+					{
+						//Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
+						Plateau->setv2(Rotation(Plateau->getv2(), Vector(1, 0, 0), P_Omega_normalise));
+						Plateau->setv1(Rotation(Plateau->getv1(), Vector(1, 0, 0), P_Omega_normalise));
+
+						//Balle->getAnim().setTheta(Balle->getAnim().getTheta() + P_Omega_normalise);
+
+						pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), P_Omega_normalise);
+
+						new_pos.translate(pos_vecteur);
+						Balle->getAnim().setPos(new_pos);
+
+						for (int i = 0; i < 4; i++)
+						{
+							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(1, 0, 0), P_Omega_normalise));
+							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(1, 0, 0), P_Omega_normalise));
+						}
+						//Calculer la nouvelle position des murs à partir des vecteurs v1 et v2
+						// Calculer la nouvelle position des murs à partir des vecteurs v1 et v2
+						/*for (int i = 0; i < 4; i++)
+						{
+							murs_list[i]->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * (i % 2 == 1 ? -0.5 : 0.5)) * Plateau->getv1() + (Mur3->getLength() * (i < 2 ? -0.5 : 0.5) * Plateau->getv2()));
+						}*/
+						Vector height = Plateau->getv2() ^ Plateau->getv1() * Bord_width / 2;
+						height = Vector(0, 0, 0);
+						Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
+						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
+						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+						Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+
+						break;
+					}
+					case SDLK_RIGHT:
+					{
+						//Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
+						Plateau->setv1(Rotation(Plateau->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
+						Plateau->setv2(Rotation(Plateau->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
+						//Balle->getAnim().setPhi(Balle->getAnim().getPhi() - P_Omega_normalise);
+
+						pos_vecteur = Rotation(pos_vecteur, Vector(0, 0, 1), -P_Omega_normalise);
+
+						new_pos.translate(pos_vecteur);
+						Balle->getAnim().setPos(new_pos);
+
+						for (int i = 0; i < 4; i++)
+						{
+							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
+							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(0, 0, 1), -P_Omega_normalise));
+						}
+						/*for (int i = 0; i < 4; i++)
+						{
+							murs_list[i]->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * (i % 2 == 1 ? -0.5 : 0.5)) * Plateau->getv1() + (Mur3->getLength() * (i < 2 ? -0.5 : 0.5) * Plateau->getv2()));
+						}*/
+						Vector height = Plateau->getv2() ^ Plateau->getv1() * Bord_width / 2;
+						height = Vector(0, 0, 0);
+						Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
+						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
+						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+						Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+						break;
+					}
+					case SDLK_LEFT:
+					{
+						//Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
+						Plateau->setv1(Rotation(Plateau->getv1(), Vector(0, 0, 1), P_Omega_normalise));
+						Plateau->setv2(Rotation(Plateau->getv2(), Vector(0, 0, 1), P_Omega_normalise));
+						//Balle->getAnim().setPhi(Balle->getAnim().getPhi() + P_Omega_normalise);
+
+						pos_vecteur = Rotation(pos_vecteur, Vector(0, 0, 1), P_Omega_normalise);
+
+						new_pos.translate(pos_vecteur);
+						Balle->getAnim().setPos(new_pos);
+
+
+						for (int i = 0; i < 4; i++)
+						{
+							murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(0, 0, 1), P_Omega_normalise));
+							murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(0, 0, 1), P_Omega_normalise));
+						}
+						/*for (int i = 0; i < 4; i++)
+						{
+							murs_list[i]->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * (i % 2 == 1 ? -0.5 : 0.5)) * Plateau->getv1() + (Mur3->getLength() * (i < 2 ? -0.5 : 0.5) * Plateau->getv2()));
+						}*/
+						Vector height = Plateau->getv2() ^ Plateau->getv1() * Bord_width / 2;
+						height = Vector(0, 0, 0);
+						Mur1->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * -0.5 * Plateau->getv2()) + height);
+						Mur2->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0) * Plateau->getv1() + (Mur3->getLength() * 0.5 * Plateau->getv2()) + height);
+						Mur3->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * -0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+						Mur4->getAnim().setPos(Plateau->getAnim().getPos() + (Mur1->getLength() * 0.5) * Plateau->getv1() + (Mur3->getLength() * 0) * Plateau->getv2() + height);
+						break;
+					}
+					case SDLK_f:
+						camAlpha -= 5;
+						break;
+					case SDLK_s:
+						camAlpha += 5;
+						break;
+					case SDLK_e:
+						scale += 0.25;
+						break;
+					case SDLK_d:
+						scale -= 0.25;
+						break;
+					case SDLK_c:
+						eyeOnBall = !eyeOnBall;
+						break;
+					case SDLK_ESCAPE: // Quit the program when Escape key is pressed
+						quit = true;
+						break;
+
+					default:
+						break;
+					}
+					break;
+				default:
+					break;
+				}
+			}
+
+			Vector v1_rotated = Plateau->getv1();
+			Vector v2_rotated = Plateau->getv2();
+			Vector a = (g * v1_rotated) * v1_rotated + (g * v2_rotated) * v2_rotated;
+			Balle->getAnim().setAccel(0.0001 * a);
+			Balle->getAnim().setSpeed(Balle->getAnim().getSpeed() * v1_rotated * v1_rotated + Balle->getAnim().getSpeed() * v2_rotated * v2_rotated + Balle->getAnim().getAccel());
+
+
+
+			/*
+		if (event.type == SDL_QUIT)
+		{
+			quit = true; // Exit the loop after this iteration
+		}
+
+		const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+
+		if (currentKeyStates[SDL_SCANCODE_UP] && Plateau->getAnim().getTheta() >= -P_incline_limit)
+		{
+			Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() - P_Omega_normalise);
+			Balle->getAnim().setTheta(Balle->getAnim().getTheta() - P_Omega_normalise);
+			for (int i = 0; i < 4; i++)
+			{
+				murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() - P_Omega_normalise);
+			}
+		}
+		if (currentKeyStates[SDL_SCANCODE_DOWN] && Plateau->getAnim().getTheta() <= P_incline_limit)
+		{
+			Plateau->getAnim().setTheta(Plateau->getAnim().getTheta() + P_Omega_normalise);
+			Balle->getAnim().setTheta(Balle->getAnim().getTheta() + P_Omega_normalise);
+			for (int i = 0; i < 4; i++)
+			{
+				murs_list[i]->getAnim().setTheta(murs_list[i]->getAnim().getTheta() + P_Omega_normalise);
+			}
+		}
+		if (currentKeyStates[SDL_SCANCODE_RIGHT] && Plateau->getAnim().getPhi() >= -P_incline_limit)
+		{
+			Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() - P_Omega_normalise);
+			Balle->getAnim().setPhi(Balle->getAnim().getPhi() - P_Omega_normalise);
+			for (int i = 0; i < 4; i++)
+			{
+				murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() - P_Omega_normalise);
+			}
+		}
+		if (currentKeyStates[SDL_SCANCODE_LEFT] && Plateau->getAnim().getPhi() <= P_incline_limit)
+		{
+			Plateau->getAnim().setPhi(Plateau->getAnim().getPhi() + P_Omega_normalise);
+			Balle->getAnim().setPhi(Balle->getAnim().getPhi() + P_Omega_normalise);
+			for (int i = 0; i < 4; i++)
+			{
+				murs_list[i]->getAnim().setPhi(murs_list[i]->getAnim().getPhi() + P_Omega_normalise);
+			}
+		}
+		if (currentKeyStates[SDL_SCANCODE_F]) {
+			//camAlpha -= 5;
+		}
+		if (currentKeyStates[SDL_SCANCODE_S]) {
+			//camAlpha += 5;
+		}
+		if (currentKeyStates[SDL_SCANCODE_ESCAPE]) {
+			quit = true;
+		}
+		}
+		*/
+
+
+			
+
+		// Update the scene
+			current_time = SDL_GetTicks(); // get the elapsed time from SDL initialization (ms)
+			elapsed_time = current_time - previous_time;
+			if (elapsed_time > ANIM_DELAY)
+			{
+				previous_time = current_time;
+				update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
+				
+			}
+
+			Point ballPos = Balle->getAnim().getPos();
+
+			// Render the scene
+			render(forms_list, camera_position, camAlpha, scale, eyeOnBall, ballPos);
+
+			// Update window screen
+			SDL_GL_SwapWindow(gWindow);
+		}
+	}
+
+	// Free resources and close SDL
+	close(&gWindow);
+
+	return 0;
 }

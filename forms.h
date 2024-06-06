@@ -63,11 +63,20 @@ class Cube_face : public Form
 private:
     Vector vdir1, vdir2;
     double length, width;
+    Point org;
     Hole* hole;
 public:
     Cube_face(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1),
           Point org = Point(), double l = 1.0, double w = 1.0,
           Color cl = Color());
+    Vector getv1() const { return vdir1; }
+    Vector getv2() const { return vdir2; }
+    void setv1(Vector vect) { vdir1 = vect; }
+    void setv2(Vector vect) { vdir2 = vect; }
+    double getLength() const { return length; }
+    double getWidth() const { return width; }
+    Point getOrg() const { return org; }
+    Point setOrg(Point pt) { org = pt; }
     void setHole(Hole* h);
     void update(double delta_t);
     void render();
@@ -90,11 +99,15 @@ class Plateau : public Form
 // Hole class definition
 class Hole : public Form
 {
-public:
+private:
     Point position; 
-    double radius;  
+    double radius; 
+public:
+     
     Hole(Point pos = Point(), double r = 1);
     Point getPosition() const {return position;}
+    void setPosition(Point pos) {position = pos;}
+    double getRadius() const {return radius;}
     void update(double delta_t) override {}
     void render();
 };
