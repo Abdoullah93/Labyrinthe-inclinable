@@ -24,6 +24,7 @@ public:
     // Overloaded standard operators
     void operator+=(const Vector &v);
     Point operator+(const Vector &v) const;
+    Point operator-(const Vector &v) const;
 };
 
 

@@ -51,12 +51,18 @@ private:
     // The sphere center is aligned with the coordinate system origin
     // => no center required here, information is stored in the anim object
     double radius;
+    Vector v_rotation;
+    GLuint texture_id;
+
 public:
     Sphere(double r = 1.0, Color cl = Color(), Point org = Point());
     double getRadius() const {return radius;}
     void setRadius(double r) {radius = r;}
     void update(double delta_t);
+    void setTexture(GLuint textureid) { texture_id = textureid; }
     void render();
+    Vector getv_rotation() const {return v_rotation; }
+    void setv_rotation(Vector v) { v_rotation = v; }
     //Vector getPosVector();
 };
 
@@ -68,6 +74,8 @@ private:
     Vector vdir1, vdir2;
     double length, width;
     Point org;
+    GLuint texture_id;
+
 public:
     Cube_face(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1),
           Point org = Point(), double l = 1.0, double w = 1.0,
@@ -78,6 +86,7 @@ public:
     Vector getv2() const { return vdir2; }
     void setv1(Vector vect) { vdir1 = vect; }
     void setv2(Vector vect) { vdir2 = vect; }
+    void setTexture(GLuint textureid) { texture_id = textureid; }
     double getLength() const { return length; }
     double getWidth() const { return width; }
 

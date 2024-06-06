@@ -20,19 +20,24 @@ Vector Rotation(Vector V, Vector A, double Alpha) {
 
 void collision(Sphere& Balle, Cube_face& mur) {
     //Par convention le vecteur v2 du mur est celui qui est orthogonal au plan
-    
+
     Vector Mur_length_v = mur.getLength() * mur.getv1();
     //Point org = mur.getOrg();
     //printf("Point coordinates: x: %.2f, y: %.2f, z: %.2f\n", org.x, org.y, org.z);
     Vector Balle_pos_m(mur.getAnim().getPos(), Balle.getAnim().getPos());
-    double Proj_length = Balle_pos_m * mur.getv1();
+    double Proj_length = abs(Balle_pos_m * mur.getv1());
     double dist_balle_mur = sqrt(pow(Balle_pos_m.norm(), 2) - pow(Proj_length, 2));
+    Vector Normale_mur = mur.getv1() ^ mur.getv2();
+    Vector V0 = Balle.getAnim().getSpeed();
+    //printf("%f \n", V0 * Normale_mur);
     printf("Proj_length : %f        Balle_pos_m.norm() : %f      mur.getLength : %f     dist_balle_mur  : %f \n", Proj_length, Balle_pos_m.norm(), mur.getLength(), dist_balle_mur);
-    if (Proj_length < mur.getLength() / 2 && dist_balle_mur < Balle.getRadius()) {
+    if (Proj_length < mur.getLength() / 2 && dist_balle_mur < Balle.getRadius() && V0 * Vector(mur.getAnim().getPos(), Point(0, 0, 0)) < 0) {
         printf("collision detected \n");
-        Vector Normale_mur = mur.getv1() ^ mur.getv2();
-        Vector V0 = Balle.getAnim().getSpeed();
-        Vector newSpeed = 1 * ((V0 * mur.getv2()) * mur.getv2() + (V0 * mur.getv1()) * mur.getv1() - (V0 * Normale_mur) * Normale_mur);
+
+        Vector newSpeed = 0.5 * ((V0 * mur.getv2()) * mur.getv2() + (V0 * mur.getv1()) * mur.getv1() - (V0 * Normale_mur) * Normale_mur);
+        Point Balle_new_pos = Balle.getAnim().getPos();
+        Balle_new_pos.translate(newSpeed);
+
         Balle.getAnim().setSpeed(newSpeed);
         Balle.getAnim().setAccel(Vector(0, 0, 0));
     }
@@ -55,10 +60,11 @@ void Form::render()
     // Rotation autour l'origine
     // Pour faire une rotation autour une axe il faut 
     // faire la translation d'abord et apres la rotation
-    glRotated(anim.getTheta(), 1, 0, 0);
+   
     glRotated(anim.getPhi(), 0, 0, 1);
     glTranslated(org.x, org.y, org.z);
-   
+
+    
     glColor3f(col.r, col.g, col.b);
 }
 
@@ -82,6 +88,7 @@ void Sphere::update(double delta_t)
 
     org.translate(0.01*anim.getSpeed().integral(delta_t));
     anim.setPos(org);
+
     //anim.setSpeed(anim.getSpeed() + anim.getAccel());
 
     /*
@@ -112,16 +119,25 @@ void Sphere::render()
     GLUquadric* quad;
 
     quad = gluNewQuadric();
-    
-    
+    Vector dir = anim.getSpeed();
+
     Form::render();
+    double alpha = getAnim().getSpeed().norm() * 180 * 0.01 / (M_PI * getRadius());
+    glRotated(alpha, getv_rotation().x, getv_rotation().y, getv_rotation().z);
     //Point org = anim.getPos();
     //glTranslated(org.x, org.y, org.z);
     //glColor3f(col.r, col.g, col.b);
+        // Mise en route de la texture associee
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    gluQuadricTexture(quad, texture_id);
+    gluQuadricNormals(quad, GLU_SMOOTH);
 
     gluSphere(quad, radius, 32, 32);  // On se prend pas la tete, c'est pour dessiner la sphere
 
     gluDeleteQuadric(quad);
+    glDisable(GL_TEXTURE_2D);
+
 }
 
 /*
@@ -212,6 +228,11 @@ void Cube_face::render()
     p4.translate(-length / 2 * vdir1);
     p4.translate(width / 2 * vdir2);
 
+    // Autorisation de la texture choisie a la creation de la face (cf main())
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+
+
     Form::render();
     // Rotation around the origin
     // For rotation around an axis, translation must be done first, then rotation
@@ -222,12 +243,20 @@ void Cube_face::render()
 
     glBegin(GL_QUADS);
     {
+        //All subsequent vertices will have an associated texture coordinate (coord x y).
+        glTexCoord2f(0.0f, 0.0f); //All subsequent vertices will have an associated texture coordinate of (0,0)
         glVertex3d(p1.x, p1.y, p1.z);
+        glTexCoord2f(1.0f, 0.0f); //All subsequent vertices will have an associated texture coordinate of (1,0)
         glVertex3d(p2.x, p2.y, p2.z);
+        glTexCoord2f(1.0f, 1.0f); //All subsequent vertices will have an associated texture coordinate of (0,0)
         glVertex3d(p3.x, p3.y, p3.z);
+        glTexCoord2f(0.0f, 1.0f); //All subsequent vertices will have an associated texture coordinate of (0,0)
         glVertex3d(p4.x, p4.y, p4.z);
     }
     glEnd();
+
+    // Ne plus appliquer la texture pour la suite
+    glDisable(GL_TEXTURE_2D);
 }
 
 

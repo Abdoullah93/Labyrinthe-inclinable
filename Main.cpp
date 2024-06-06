@@ -5,7 +5,7 @@
 #include <SDL.h>
 #include <gl\glew.h>  // glu.h included
 #include <SDL_opengl.h>
-
+#include <SDL_image.h>
 // Module for space geometry
 #include "geometry.h"
 // Module for generating and rendering forms
@@ -48,6 +48,8 @@ Vector Rotation(Vector V, Vector A, double Alpha);
 
 void collision(Sphere& Balle, Cube_face& mur);
 
+int createTextureFromImage(const char* filename, GLuint* textureID);
+
 
 // Definition des parametres des objets et de l'environnement
 // Dans le code il faut faire reference a ces constants la, PAS DE VALEURS NUMERIQUES
@@ -75,7 +77,7 @@ bool init(SDL_Window** window, SDL_GLContext* context)
 	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
+		//std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
 		success = false;
 	}
 	else
@@ -88,7 +90,7 @@ bool init(SDL_Window** window, SDL_GLContext* context)
 		*window = SDL_CreateWindow("TP intro OpenGL / SDL 2", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 		if (*window == NULL)
 		{
-			std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
+			//std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
 			success = false;
 		}
 		else
@@ -97,7 +99,7 @@ bool init(SDL_Window** window, SDL_GLContext* context)
 			*context = SDL_GL_CreateContext(*window);
 			if (*context == NULL)
 			{
-				std::cout << "OpenGL context could not be created! SDL Error: " << SDL_GetError() << std::endl;
+				//std::cout << "OpenGL context could not be created! SDL Error: " << SDL_GetError() << std::endl;
 				success = false;
 			}
 			else
@@ -105,13 +107,13 @@ bool init(SDL_Window** window, SDL_GLContext* context)
 				// Use Vsync
 				if (SDL_GL_SetSwapInterval(1) < 0)
 				{
-					std::cout << "Warning: Unable to set VSync! SDL Error: " << SDL_GetError() << std::endl;
+					//std::cout << "Warning: Unable to set VSync! SDL Error: " << SDL_GetError() << std::endl;
 				}
 
 				// Initialize OpenGL
 				if (!initGL())
 				{
-					std::cout << "Unable to initialize OpenGL!" << std::endl;
+					//std::cout << "Unable to initialize OpenGL!" << std::endl;
 					success = false;
 				}
 			}
@@ -181,7 +183,7 @@ bool initGL()
 	error = glGetError();
 	if (error != GL_NO_ERROR)
 	{
-		std::cout << "Error initializing OpenGL!  " << gluErrorString(error) << std::endl;
+		//std::cout << "Error initializing OpenGL!  " << gluErrorString(error) << std::endl;
 		success = false;
 	}
 
@@ -256,6 +258,53 @@ void close(SDL_Window** window)
 	SDL_Quit();
 }
 
+/*
+int createTextureFromImage(const char* filename, GLuint* textureID)
+{
+	cout << "Loading texture image: " << filename << endl;
+	SDL_Surface* imgSurface = IMG_Load(filename);
+	if (imgSurface == NULL)
+	{
+		std::cerr << "Failed to load texture image: " << filename << std::endl;
+		return -1;
+	}
+	else
+	{
+		// Work out what format to tell glTexImage2D to use...
+		int mode;
+		if (imgSurface->format->BytesPerPixel == 3)   // RGB 24bit
+		{
+			mode = GL_RGB;
+		}
+		else if (imgSurface->format->BytesPerPixel == 4)     // RGBA 32bit
+		{
+			mode = GL_RGBA;
+		}
+		else
+		{
+			SDL_FreeSurface(imgSurface);
+			std::cerr << "Unable to detect the image color format of: " << filename << std::endl;
+			return -2;
+		}
+		// create one texture name
+		glGenTextures(1, textureID);
+
+		// tell opengl to use the generated texture name
+		glBindTexture(GL_TEXTURE_2D, *textureID);
+
+		// this reads from the sdl imgSurface and puts it into an openGL texture
+		glTexImage2D(GL_TEXTURE_2D, 0, mode, imgSurface->w, imgSurface->h, 0, mode, GL_UNSIGNED_BYTE, imgSurface->pixels);
+
+		// these affect how this texture is drawn later on...
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		// clean up
+		SDL_FreeSurface(imgSurface);
+		return 0;
+	}
+}
+*/
 
 /***************************************************************************/
 /* MAIN Function                                                           */
@@ -272,7 +321,7 @@ int main(int argc, char* args[])
 	// Start up SDL and create window
 	if (!init(&gWindow, &gContext))
 	{
-		std::cout << "Failed to initialize!" << std::endl;
+		//std::cout << "Failed to initialize!" << std::endl;
 	}
 	else
 	{
@@ -285,6 +334,9 @@ int main(int argc, char* args[])
 
 		// Camera position
 		Point camera_position(0, 0.0, 5.0);
+
+		GLuint textureid_1;
+		createTextureFromImage("resources/images/tiles.bmp", &textureid_1);
 
 		// The forms to render
 		Form* forms_list[MAX_FORMS_NUMBER];
@@ -341,7 +393,7 @@ int main(int argc, char* args[])
 		Sphere* Balle = NULL;
 		Balle = new Sphere(B_radius, B_color);
 		Balle->getAnim().setPos(Point (0, B_radius, 0));
-
+		Balle->setTexture(textureid_1);
 		
 		Vector* B_Speed = new Vector(0, 0, 0);
 		Balle->getAnim().setSpeed(*B_Speed);
@@ -542,6 +594,11 @@ int main(int argc, char* args[])
 			Balle->getAnim().setAccel(a);
 			Balle->getAnim().setSpeed(Balle->getAnim().getSpeed()* v1_rotated* v1_rotated + Balle->getAnim().getSpeed() * v2_rotated * v2_rotated + Balle->getAnim().getAccel());
 
+
+
+			//Rotation de la balle
+			Vector v_rot = v1_rotated ^ v2_rotated ^ Balle->getAnim().getSpeed();
+			Balle->setv_rotation(-v_rot);
 			
 
 				/*

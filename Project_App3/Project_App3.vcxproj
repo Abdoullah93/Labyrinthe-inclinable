@@ -73,8 +73,8 @@
     <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\Projet_Labyrinthe_incline\dependance\SDL2\include;D:\Projet_Labyrinthe_incline\dependance\glew\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Projet_Labyrinthe_incline\dependance\glew\lib\Release\x64;D:\Projet_Labyrinthe_incline\dependance\SDL2\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>\Users\adamm\OneDrive\Bureau\dependance\SDL2\include;\Users\adamm\OneDrive\Bureau\dependance\glew\include;$(IncludePath)</IncludePath>
+    <LibraryPath>\Users\adamm\OneDrive\Bureau\dependance\SDL2\lib\x64;\Users\adamm\OneDrive\Bureau\dependance\glew\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -98,7 +98,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;glew32.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;glew32.lib;opengl32.lib;glu32.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
