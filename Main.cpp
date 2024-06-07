@@ -11,6 +11,8 @@
 // Module for generating and rendering forms
 #include "forms.h"
 
+// for font printing
+#include <openglut.h>
 
 using namespace std;
 
@@ -197,22 +199,50 @@ void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
 	}
 }
 
-void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos, double camAlpha, double scale, bool eyeOnBall, Point ballPos)
+
+// ebauche pour afficher du texte
+void output(int x, int y, float r, float g, float b, void* font, char* string)
+{
+	// Set the projection matrix to the identity matrix
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	// Set the modelview matrix to the identity matrix
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	// Set the raster position in 3D space
+	glRasterPos3f(x, y, 0.0f);
+
+	// Set the color
+	glColor3f(r, g, b);
+
+	// Loop through each character in the string
+	int len = strlen(string);
+	for (int i = 0; i < len; i++) {
+		// Render each character using glutBitmapCharacter
+		glutBitmapCharacter(font, string[i]);
+	}
+}
+
+void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos, double camAlpha, double scale, double lambda, bool eyeOnBall, Point ballPos)
 {
 	// Clear color buffer and Z-Buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// Initialize Modelview Matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	//print time
+	
 
 	// Set the camera position and parameters
-	gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-	/*if (eyeOnBall) {
-		gluLookAt(cam_pos.x, cam_pos.y + 6, cam_pos.z, ballPos.x, ballPos.y, ballPos.z, 0, 1, 0);
+	//gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	if (eyeOnBall) {
+		gluLookAt(cam_pos.x, cam_pos.y + lambda, cam_pos.z, ballPos.x, ballPos.y, ballPos.z, 0, 1, 0);
 	}
 	else {
 		gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-	}*/
+	}
 	
 	// Isometric view
 	glRotated(-45, 0, 1, 0);
@@ -225,13 +255,14 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos, double camAl
 
 	// X, Y and Z axis
 	//glPushMatrix(); // Preserve the camera viewing point for further forms
-	// Render the coordinates system
+	//// Render the coordinates system
 	//glBegin(GL_LINES);
 	//{
+	//	output(0, 0, 1.0f, 1.0f, 1.0f, GLUT_BITMAP_TIMES_ROMAN_24, "AAAAAAAAAA");
 	//	// X rouge
 	//	// Y vert
 	//	// Z bleue
-	//	glColor3f(1.0f, 0.0f, 0.0f);
+	//	/*glColor3f(1.0f, 0.0f, 0.0f);
 	//	glVertex3i(0, 0, 0);
 	//	glVertex3i(1, 0, 0);
 	//	glColor3f(0.0f, 1.0f, 0.0f);
@@ -239,11 +270,11 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point& cam_pos, double camAl
 	//	glVertex3i(0, 1, 0);
 	//	glColor3f(0.0f, 0.0f, 1.0f);
 	//	glVertex3i(0, 0, 0);
-	//	glVertex3i(0, 0, 1);
+	//	glVertex3i(0, 0, 1);*/
 	//}
 	//glEnd();
 	//glPopMatrix(); // Restore the camera viewing point for next object
-	// Render the list of forms
+	//// Render the list of forms
 	unsigned short i = 0;
 	while (formlist[i] != NULL)
 	{
@@ -275,6 +306,8 @@ Point NewPos(Cube_face f, Cube_face p) {
 }
 
 
+
+
 /***************************************************************************/
 /* MAIN Function                                                           */
 /***************************************************************************/
@@ -291,6 +324,8 @@ int main(int argc, char* args[])
 	double scale = 1;
 	//
 	bool eyeOnBall = true;
+	//
+	double lambda = 0;
 
 	// Start up SDL and create window
 	if (!init(&gWindow, &gContext))
@@ -519,11 +554,11 @@ int main(int argc, char* args[])
 				}
 				if (currentKeyStates[SDL_SCANCODE_E])
 				{
-					scale += 0.25;
+					lambda += 0.1;
 				}
 				if (currentKeyStates[SDL_SCANCODE_D])
 				{
-					scale -= 0.25;
+					lambda -= 0.1;
 				}
 				if (currentKeyStates[SDL_SCANCODE_ESCAPE])
 				{
@@ -534,7 +569,12 @@ int main(int argc, char* args[])
 			switch (key_pressed) {
 			case SDLK_b:
 				eyeOnBall = !eyeOnBall;
-				SDL_Delay(100);
+				break;
+			case SDLK_a:
+				scale += 0.25;
+				break;
+			case SDLK_z:
+				scale -= 0.25;
 				break;
 			}
 			for (int i = 0; i < 11; i++)
@@ -562,7 +602,7 @@ int main(int argc, char* args[])
 
 			// Render the scene
 			Point ballPos = Balle->getAnim().getPos();
-			render(forms_list, camera_position, camAlpha, scale, true, ballPos);// eyeonball = false
+			render(forms_list, camera_position, camAlpha, scale, lambda, eyeOnBall, ballPos);// eyeonball = false
 
 			// Update window screen
 			SDL_GL_SwapWindow(gWindow);
