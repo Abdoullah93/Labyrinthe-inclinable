@@ -16,6 +16,41 @@ Vector Rotation(Vector V, Vector A, double Alpha) {
     Vector V_rot = cos(Alpha) * V + sin(Alpha) * (A ^ V) + (1 - cos(Alpha)) * (A * V) * A;
     return V_rot;
 }
+void collision(Sphere& Balle, Cube_face& mur, double delta_t) {
+    //Par convention le vecteur v2 du mur est celui qui est orthogonal au plan
+
+    Vector Mur_length_v = mur.getLength() * mur.getv1();
+    //Point org = mur.getOrg();
+    //printf("Point coordinates: x: %.2f, y: %.2f, z: %.2f\n", org.x, org.y, org.z);
+    Vector Balle_pos_m(mur.getAnim().getPos(), Balle.getAnim().getPos());
+    double Proj_length = abs(Balle_pos_m * mur.getv1());
+    double dist_balle_mur = sqrt(pow(Balle_pos_m.norm(), 2) - pow(Proj_length, 2));
+    Vector Normale_mur = mur.getv1() ^ mur.getv2();
+    Vector V0 = Balle.getAnim().getSpeed();
+    //printf("%f \n", V0 * Normale_mur);
+    //printf("Proj_length : %f        Balle_pos_m.norm() : %f      mur.getLength : %f     dist_balle_mur  : %f \n", Proj_length, Balle_pos_m.norm(), mur.getLength(), dist_balle_mur);
+    if (Proj_length < mur.getLength() / 2 && dist_balle_mur < Balle.getRadius() && V0 * Vector(mur.getAnim().getPos(), Point(0, 0, 0)) < 0) {
+        printf("collision detected \n");
+
+        Vector newSpeed = 0.5 * ((V0 * mur.getv2()) * mur.getv2() + (V0 * mur.getv1()) * mur.getv1() - (V0 * Normale_mur) * Normale_mur);
+        Point new_Balle_pos = Balle.getAnim().getPos();
+        new_Balle_pos.translate(0.01 * newSpeed.integral(delta_t));
+        Vector new_balle_vect(mur.getAnim().getPos(), new_Balle_pos);
+
+        double Proj_length = abs(new_balle_vect * mur.getv1());
+        double dist_balle_mur = sqrt(pow(new_balle_vect.norm(), 2) - pow(Proj_length, 2));
+        if (Proj_length < mur.getLength() / 2 && dist_balle_mur < Balle.getRadius()) {
+            new_balle_vect = (Balle.getRadius() / dist_balle_mur) * new_balle_vect;
+            Point newPos = Balle.getAnim().getPos();
+            newPos.translate(new_balle_vect);
+            Balle.getAnim().setPos(newPos);
+        }
+
+        Balle.getAnim().setSpeed(newSpeed);
+        Balle.getAnim().setAccel(Balle.getAnim().getAccel() - (Balle.getAnim().getAccel() * Normale_mur) * Normale_mur);
+    }
+
+}
 
 
 bool collisionHole(Sphere* ball, Cube_face* plateau) {
@@ -34,14 +69,14 @@ bool collisionHole(Sphere* ball, Cube_face* plateau) {
          //cout << "collision" << endl;
          // 
         // Update the position of the sphere
-        cout << "holePos.x: " << holeOGlobal.x << " holePos.y: " << holeOGlobal.y << "" << holeOGlobal << endl;
+       // cout << "holePos.x: " << holeOGlobal.x << " holePos.y: " << holeOGlobal.y << "" << holeOGlobal << endl;
         Point newPos = holeOGlobal;
-        newPos.translate(-hole->getRadius()*(plateau->getv1()^plateau->getv2()));
-        cout<< "newPos: " << newPos.x << " " << newPos.y << " " << newPos.z << endl;
+        //newPos.translate(-hole->getRadius()*(plateau->getv1()^plateau->getv2()));
+        //cout<< "newPos: " << newPos.x << " " << newPos.y << " " << newPos.z << endl;
        
         ball->getAnim().setPos(newPos);
         ball->getAnim().setSpeed(Vector(0, 0, 0));
-        //ball->getAnim().setAccel(Vector(0, -9.81, 0));
+       // ball->getAnim().setAccel(Vector(0, -9.81, 0));
         return true;
     }
 	return false;
@@ -217,12 +252,16 @@ void Cube_face::render() {
         
                 double x = hole->getPosition().x;
                 double y = hole->getPosition().y;
-                Vector holeOriginInNewBase = x*vdir1 + y*vdir2 + 0.001 * (vdir2^vdir1);
-                Point holeOrigin(holeOriginInNewBase.x, holeOriginInNewBase.y, holeOriginInNewBase.z);
+                //printf("x: %f, y: %f\n", x, y);
+               // double z = hole->getPosition().z;
                 
+                Vector holeOriginInNewBase = x*vdir1 + y*vdir2 + 0.001*(vdir2^vdir1);
+                Point holeOrigin(holeOriginInNewBase.x, holeOriginInNewBase.y, holeOriginInNewBase.z);
+                //printf("holeOrigin.x: %f, holeOrigin.y: %f, holeOrigin.z: %f\n", holeOrigin.x, holeOrigin.y, holeOrigin.z);
+                //printf("%f",holeOriginInNewBase.z);
 
                 // Translate to the hole's position relative to the cube face
-                glTranslatef(holeOrigin.x, holeOrigin.y, holeOrigin.z);
+                //glTranslatef(holeOrigin.x, holeOrigin.y, holeOrigin.z);
 
                 // Rotate the disk to be parallel with the cube face
                 // Adjust the axis and angle based on your cube face orientation
