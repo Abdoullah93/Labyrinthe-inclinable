@@ -109,7 +109,7 @@ private:
 public:
      
     Hole(Point pos = Point(), double r = 1);
-    Point getPosition() const {return position;}
+    Point getPosition() {return position;}
     void setPosition(Point pos) {position = pos;}
     double getRadius() const {return radius;}
     void update(double delta_t) override {}

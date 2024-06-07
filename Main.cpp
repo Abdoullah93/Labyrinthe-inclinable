@@ -322,7 +322,7 @@ int main(int argc, char* args[])
 		number_of_forms++;
 
 		Hole* hole = NULL;
-		hole = new Hole(Point(0.25, 0.25), 0.25);
+		hole = new Hole(Point(0.5, 0.5), 0.25);
 		Plateau->setHole(hole);
 
 
@@ -375,6 +375,7 @@ int main(int argc, char* args[])
 			while (SDL_PollEvent(&event) != 0)
 			{
 				chute = false;
+					cout << "inside" << endl;
 					int x = 0, y = 0;
 					SDL_Keycode key_pressed = event.key.keysym.sym;
 					Point pos = Balle->getAnim().getPos();
@@ -409,10 +410,12 @@ int main(int argc, char* args[])
 								murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(1, 0, 0), -P_Omega_normalise));
 								murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(1, 0, 0), -P_Omega_normalise));
 							}
-
-							pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), -P_Omega_normalise);
-							new_pos.translate(pos_vecteur);
-							Balle->getAnim().setPos(new_pos);
+							if (!chute)
+							{
+								pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), -P_Omega_normalise);
+								new_pos.translate(pos_vecteur);
+								Balle->getAnim().setPos(new_pos);
+							}
 
 							// Revoir height pour qu'il soit correct
 							Vector height = Plateau->getv2() ^ Plateau->getv1() * Bord_width / 2;
@@ -434,9 +437,11 @@ int main(int argc, char* args[])
 
 							pos_vecteur = Rotation(pos_vecteur, Vector(1, 0, 0), P_Omega_normalise);
 
-							new_pos.translate(pos_vecteur);
-							Balle->getAnim().setPos(new_pos);
-
+							if (!chute)
+							{
+								new_pos.translate(pos_vecteur);
+								Balle->getAnim().setPos(new_pos);
+							}
 							for (int i = 0; i < 4; i++)
 							{
 								murs_list[i]->setv2(Rotation(murs_list[i]->getv2(), Vector(1, 0, 0), P_Omega_normalise));
@@ -465,10 +470,11 @@ int main(int argc, char* args[])
 							//Balle->getAnim().setPhi(Balle->getAnim().getPhi() - P_Omega_normalise);
 
 							pos_vecteur = Rotation(pos_vecteur, Vector(0, 0, 1), -P_Omega_normalise);
-
-							new_pos.translate(pos_vecteur);
-							Balle->getAnim().setPos(new_pos);
-
+							if (!chute)
+							{
+								new_pos.translate(pos_vecteur);
+								Balle->getAnim().setPos(new_pos);
+							}
 							for (int i = 0; i < 4; i++)
 							{
 								murs_list[i]->setv1(Rotation(murs_list[i]->getv1(), Vector(0, 0, 1), -P_Omega_normalise));
@@ -494,10 +500,11 @@ int main(int argc, char* args[])
 							//Balle->getAnim().setPhi(Balle->getAnim().getPhi() + P_Omega_normalise);
 
 							pos_vecteur = Rotation(pos_vecteur, Vector(0, 0, 1), P_Omega_normalise);
-
-							new_pos.translate(pos_vecteur);
-							Balle->getAnim().setPos(new_pos);
-
+							if (!chute)
+							{
+								new_pos.translate(pos_vecteur);
+								Balle->getAnim().setPos(new_pos);
+							}
 
 							for (int i = 0; i < 4; i++)
 							{
@@ -550,24 +557,22 @@ int main(int argc, char* args[])
 					}
 				}
 
-				if (!chute)
-				{
-				// Check if the ball is in the hole
-				chute = collisionHole(Balle, Plateau);
 
-				Vector v1_rotated = Plateau->getv1();
-				Vector v2_rotated = Plateau->getv2();
-				Vector a = (g * v1_rotated) * v1_rotated + (g * v2_rotated) * v2_rotated;
-				Balle->getAnim().setAccel(0.0001 * a);
-				Balle->getAnim().setSpeed(Balle->getAnim().getSpeed() * v1_rotated * v1_rotated + Balle->getAnim().getSpeed() * v2_rotated * v2_rotated + Balle->getAnim().getAccel());
-			}
-			if (chute)
-			{
-				
-				Balle->getAnim().setAccel(0.0001 * Vector(0, -9.81, 0));
-				
-			}
+				//if (!chute) {
+					// Check if the ball is in the hole
+					chute = collisionHole(Balle, Plateau);
 
+					Vector v1_rotated = Plateau->getv1();
+					Vector v2_rotated = Plateau->getv2();
+					Vector a = (g * v1_rotated) * v1_rotated + (g * v2_rotated) * v2_rotated;
+					Balle->getAnim().setAccel(0.0001 * a);
+					Balle->getAnim().setSpeed(Balle->getAnim().getSpeed() * v1_rotated * v1_rotated + Balle->getAnim().getSpeed() * v2_rotated * v2_rotated + Balle->getAnim().getAccel());
+
+				//}
+				//else {
+					//Balle->getAnim().setAccel(0.0001 * Vector(0,-9.81,0));
+				//}
+				
 			
 
 		// Update the scene
